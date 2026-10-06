@@ -1,0 +1,71 @@
+* async and await in JavaScript are used to handle asynchronous operations in a more readable and structured way. They make asynchronous code (like promises) look more like synchronous code, which is easier to understand and manage.
+
+Key Concepts:
+
+- async function: 
+Declaring a function with the async keyword makes it return a promise. Even if you return a regular value inside an async function, it will automatically wrap it in a promise.
+
+- await keyword: 
+The await keyword can only be used inside async functions. It pauses the execution of the function until the promise is resolved (completed) and returns the result of the promise.
+
+Why Use async/await?
+
+It simplifies the syntax for working with promises, avoiding the need for .then() and .catch() methods.
+It makes asynchronous code look more like synchronous code, improving readability.
+
+--------------------------------------------------------------------------
+Example: Using Promises (Without async/await)
+
+function getData() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve('Data received');
+    }, 2000);
+  });
+}
+
+getData().then((data) => {
+  console.log(data); // Output: 'Data received' after 2 seconds
+});
+
+---------------------------------------------------------------------------
+----------------------------------------------------------------------------
+Example: Using async/await
+
+
+async function fetchData() {
+  // The execution will pause here until the promise is resolved
+  const data = await getData();
+  console.log(data); // Output: 'Data received'
+}
+fetchData();
+
+How It Works:
+
+- async function: In the second example, the fetchData() function is marked as async, which means it returns a promise.
+
+- await: The await keyword is used to pause the execution of fetchData() until getData() resolves. When getData() completes, await will return the resolved value (in this case, "Data received").
+
+------------------------------------------------------------------------
+Handling Errors with async/await:
+
+You can handle errors using try/catch blocks, which also makes error handling more straightforward compared to .catch() in promises.
+
+async function fetchData() {
+  try {
+    const data = await getData();
+    console.log(data); // Output: 'Data received'
+  } catch (error) {
+    console.log('Error:', error);
+  }
+}
+----------------------------------------------------------------------------
+Summary:
+
+async: Declares an asynchronous function that returns a promise.
+
+await: Pauses the function execution until a promise is resolved, then returns the result.
+
+Benefits: Simplifies asynchronous code, making it easier to read and manage compared to the traditional promise syntax.
+
+Using async/await makes it easier to work with asynchronous JavaScript, especially when you have multiple asynchronous operations.

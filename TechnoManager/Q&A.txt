@@ -1,0 +1,59 @@
+Interview-ready answer
+"Yes, I can handle a project or feature independently. In my current project, I take ownership of my Angular responsibilities from requirement understanding to development, API integration, validation, testing and deployment support.
+I first understand the requirement and the existing architecture, then I break the work into smaller tasks and plan the implementation. If I have a dependency on the backend or another team, I coordinate with them rather than waiting until the last moment.
+At the same time, I don't hesitate to discuss important technical decisions with senior developers or the architect when required.
+So I am comfortable working independently, but I also believe that a project should be delivered collaboratively. I can own my module independently while keeping the team and stakeholders informed."
+
+If they ask: "Can you handle the entire project independently?"
+Say:
+"Yes, from the frontend perspective, I am comfortable taking end-to-end ownership of a module or feature. I can understand the requirement, design the Angular solution, develop the components and services, integrate APIs, handle validations and errors, test the functionality, fix issues and support deployment.
+For areas outside my expertise, such as backend or infrastructure changes, I would coordinate with the respective team rather than making assumptions."
+
+
+
+*  Production issue — Large file upload / FormData
+
+One production issue I handled was related to file upload in our partner onboarding application.
+We have a document upload feature where partners upload documents as part of the onboarding process. Initially, we were sending the file and other details as a normal JSON payload.
+The functionality was working correctly in the local environment, but when it was deployed to the higher environment, larger files were failing during upload. The issue was related to the request payload size and the way the file data was being sent.
+
+I started debugging it by checking the browser Network tab and comparing the request from the local and deployed environments. I found that sending the file as part of the JSON payload was creating a very large request.
+
+We changed the frontend implementation to use "FormData", where the file is sent as "multipart" form data along with the required fields instead of converting the file into a large JSON payload.
+
+On the Angular side, we created a FormData object, appended the file and required form values, and sent it through the API.
+After implementing this, we tested different file sizes and different document types in the target environment and confirmed that the upload was working correctly.
+
+The main learning for me was that something working locally doesn't always mean it will work in production. File size limits, request configuration and environment-level restrictions also need to be considered when dealing with file uploads.
+
+If they ask: "What exactly did you change?"
+You can say:
+Earlier, we were effectively sending the file data as part of a JSON request, which could make the payload very large. We changed it to multipart/form-data using the browser's FormData API.
+
+For example:
+const formData = new FormData();
+formData.append('file', file);
+formData.append('partnerId', partnerId);
+formData.append('documentType', documentType);
+
+this.http.post(apiUrl, formData);
+
+The browser then sends the request as multipart form data with the file as a separate part.
+
+Very important technical point
+If the interviewer asks:
+"Was FormData itself the solution to the server's maximum request-size limit?"
+Don't say that blindly.
+Say:
+"FormData reduced the overhead and allowed us to send the file as multipart data instead of embedding the file content inside JSON. However, the final upload limit is still controlled by the backend/server configuration. So we also verified that the API and deployment environment supported the required file size."
+
+That's a much stronger answer technically.
+If they ask: "Why was it working locally?"
+Say:
+"The local environment and deployed environment had different request-handling configurations. The local setup was more permissive, while the deployed environment had request-size or upload-related restrictions. That's why the issue appeared only after deployment."
+
+30-second version
+If the interviewer wants a quick answer:
+"We had a production issue with document upload. The upload was working locally but larger files were failing after deployment because we were sending the file data in a large JSON payload. I checked the Network tab and compared the requests between environments. We changed the implementation to use FormData and multipart/form-data, sending the file separately along with the required fields. We also verified the backend and environment file-size configuration. After testing different file sizes, the upload worked correctly. The key learning was to consider environment-level request and upload limits, not just local functionality."
+
+This is a very good story for Q2: "Tell me about a production issue you handled" because it naturally demonstrates problem → investigation → root cause → solution → validation → learning.

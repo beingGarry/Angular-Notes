@@ -1,0 +1,143 @@
+
+
+CSS Box Model
+
+The CSS Box Model is a concept that describes how every HTML element is displayed as a rectangular box. It consists of Content, Padding, Border, and Margin.
+
+Diagram
+┌───────────────────────────────────────────────┐
+│                    MARGIN                     │
+│   ┌───────────────────────────────────────┐   │
+│   │                 BORDER                │   │
+│   │   ┌───────────────────────────────┐   │   │
+│   │   │            PADDING            │   │   │
+│   │   │   ┌───────────────────────┐   │   │   │
+│   │   │   │        CONTENT        │   │   │   │
+│   │   │   │   Text / Image etc.   │   │   │   │
+│   │   │   └───────────────────────┘   │   │   │
+│   │   └───────────────────────────────┘   │   │
+│   └───────────────────────────────────────┘   │
+└───────────────────────────────────────────────┘
+1. Content
+
+The content is the actual information inside an element.
+
+Examples:
+
+Text
+Images
+Videos
+Other HTML elements
+<div>Hello World</div>
+
+Here, "Hello World" is the content.
+
+2. Padding
+
+Padding is the space between the content and the border.
+
+It creates internal space inside the element.
+
+.box {
+  padding: 20px;
+}
+Border
+   ↓
+┌───────────────────┐
+│     Padding       │
+│   ┌───────────┐   │
+│   │  Content  │   │
+│   └───────────┘   │
+│     Padding       │
+└───────────────────┘
+3. Border
+
+The border is the line surrounding the padding and content.
+
+.box {
+  border: 2px solid black;
+}
+
+Example:
+
+┌───────────────────┐ ← Border
+│      Content      │
+└───────────────────┘
+4. Margin
+
+Margin is the space outside the border.
+
+It creates space between an element and other elements.
+
+.box {
+  margin: 20px;
+}
+Element 1              Element 2
+┌──────────┐          ┌──────────┐
+│ Content  │ ← Margin → │ Content │
+└──────────┘          └──────────┘
+Simple Interview Answer
+
+"The CSS Box Model consists of four parts: Content, Padding, Border, and Margin. Content is the actual data inside the element. Padding is the space between the content and border. Border surrounds the padding and content. Margin is the space outside the border that separates the element from other elements."
+
+
+CSS Box Model
+
+The CSS Box Model describes how every HTML element is represented as a rectangular box on a webpage.
+
+It consists of 4 layers:
+
+Content
+Padding
+Border
+Margin
+
+┌───────────────────────────────────────────────┐
+│                    MARGIN                     │
+│   ┌───────────────────────────────────────┐   │
+│   │                 BORDER                │   │
+│   │   ┌───────────────────────────────┐   │   │
+│   │   │            PADDING            │   │   │
+│   │   │   ┌───────────────────────┐   │   │   │
+│   │   │   │        CONTENT        │   │   │   │
+│   │   │   │   Text / Image etc.   │   │   │   │
+│   │   │   └───────────────────────┘   │   │   │
+│   │   └───────────────────────────────┘   │   │
+│   └───────────────────────────────────────┘   │
+└───────────────────────────────────────────────┘
+Example
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+  margin: 10px;
+}
+
+By default, with box-sizing: content-box:
+
+Total Width
+= Content Width
++ Left & Right Padding
++ Left & Right Border
++ Left & Right Margin
+
+= 200 + 40 + 10 + 20
+= 270px
+Important: box-sizing
+* {
+  box-sizing: border-box;
+}
+
+With border-box, the declared width includes:
+
+Content + Padding + Border
+
+So:
+
+width: 200px;
+
+means the element's width, including padding and border, stays 200px (margin is still outside).
+
+Short Interview Answer
+
+"The CSS Box Model explains how the size and spacing of an HTML element are calculated. Every element consists of content, padding, border, and margin. Padding creates space inside the border, while margin creates space outside the element."

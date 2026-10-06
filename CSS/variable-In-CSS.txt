@@ -1,0 +1,63 @@
+
+ Declaring a Variable: 
+
+:root {
+  --primary-color: #3498db;
+  --font-size-large: 18px;
+}
+Here:
+
+--primary-color is a custom property that holds the color value #3498db.
+--font-size-large holds the font size 18px.
+
+Using the Variable:
+To use a declared CSS variable, you use the var() function.
+
+css
+Copy code
+body {
+  color: var(--primary-color);
+  font-size: var(--font-size-large);
+}
+
+Example:
+
+:root {
+  --main-bg-color: lightblue;
+  --text-color: #333;
+  --padding-size: 10px;
+}
+
+header {
+  background-color: var(--main-bg-color);
+  color: var(--text-color);
+  padding: var(--padding-size);
+}
+
+Scope of Variables:
+Variables declared within :root are global, meaning they can be used anywhere in the document.
+Variables declared inside a specific selector are scoped to that selector and its descendants.
+Example of Local Scope:
+css
+Copy code
+.button {
+  --button-color: green;
+  background-color: var(--button-color);
+}
+
+.alert {
+  --button-color: red;
+  background-color: var(--button-color);
+}
+In this case, .button uses a green background, while .alert uses red because they define their own local values for --button-color.
+
+Default Fallback:
+You can provide a fallback value if a variable is not defined:
+
+css
+Copy code
+h1 {
+  color: var(--heading-color, black); /* black is used if --heading-color is not defined */
+}
+Summary:
+CSS variables allow you to store reusable values that can be easily updated and applied across the stylesheet using the var() function. This enhances maintainability and flexibility, especially for theming and large projects.

@@ -1,0 +1,56 @@
+== vs === in JavaScript
+* "=="  Loose Equality
+
+== compares values after type conversion (type coercion) if the types are different.
+
+console.log(5 == '5');
+
+Output:
+
+true
+
+Because JavaScript converts '5' into 5.
+
+More examples
+console.log(0 == false); // true
+console.log('' == false); // true
+console.log(null == undefined); // true
+
+
+* "==="  Strict Equality
+
+=== compares both:
+
+Value
+Data type
+
+It does not perform type conversion.
+
+console.log(5 === '5');
+
+Output:
+
+false
+
+Because:
+
+5     → number
+'5'   → string
+Comparison
+                                                        
+- Loose equality (==)                              Strict equality(===)
+Compares values after type coercion         	Compares value and type
+Performs implicit type conversion	            No type conversion
+Can produce unexpected results	                More predictable
+Generally avoided	                            Recommended
+
+
+Example
+console.log(10 == '10');   // true
+console.log(10 === '10');  // false
+
+console.log(true == 1);    // true
+console.log(true === 1);   // false
+Interview-Ready Answer 🎯
+
+"== is called loose equality because JavaScript performs type coercion before comparison when needed. === is called strict equality because it compares both value and type without type coercion. In modern JavaScript, === is generally preferred because it provides more predictable results."

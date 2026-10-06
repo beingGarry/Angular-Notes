@@ -1,0 +1,741 @@
+RXJS Introduction
+
+RXJS (Reactive Extension for Javascript)
+It is javascript library that uses observables to work with reactive programming that deals with asynchronous data, callback and event based programs.
+RxJS can be used with other JS libraries and frameworks.
+Supported by JS and TS.
+It is defined as library for composing asynchronous and event-based programming by using observable sequences.
+It provides one core type, the observable, satellite types (observer, schedulers, subject and operators inspired by Array extras (map, filter, reduce, every) to allow handling asynchronous event as collection.
+
+When to use Rxjs.
+
+If your project consist of lot of async task handling than RXJS is a good choice.
+
+It is loaded by default with the angular projects.
+
+- Observables / Observer / Subscription
+
+* Observables :
+
+- Observables are key part of reactive programming in Angular, allowing you to work with asynchronous data streams.
+- They provide a way to manage events, asynchronous task, and data streams in clean declarative manner.
+- Represents a data stream that can emit multiple values over time.
+Observer :
+
+An object that subscribes to the observable to receive data.
+
+Subscription :
+
+Represent the execution of an observable, allowing you to unsubscribe when needed.
+
+operators :
+
+functions that allows you to manipulate the data emitted by an observable
+
+(e.g map, filter, debounceTime)
+
+- Observables sends the data in streams / packages.
+
+The observable is used to represent the idea of invokable collection of future values or event. It can be defined as a function that creates an observer and attached to the source where values are expected.
+
+e.g clicks, mouseevent from dom, HTTP Request.
+
+Page 41 — Observer / Subject / Schedulers
+
+- observer
+It is collection of callbacks that are used to specify how to listen to values delivered by the observables.
+It can be specified as an object with next(), error(), and complete() methods, that will be executed when you have to interact with observable.
+- Subscription
+It is used to represent the execution of an observable. It is primarily used to cancel the execution.
+Allowing you to unsubscribe when needed.
+Subject
+A subject is equivalent to event-emmiter and used to multicast a value or event to multiple observes.
+Consider a button with an event listener, the function attached to the event will be called whenever user will click on the button.
+schedulers :
+
+Are centralized dispatchers that are used to control concurrency. They are used to control the execution when the subscription has start and notified.
+
+
+* forkJoin →
+
+- It is used to wait multiple observable to complete and then emit an array of the last values emitted by each observable.
+This operator is useful when you want to make multiple HTTP request and then combine the result.
+
+Here’s an example of how forkJoin can be used in angular to make multiple HTTP request and then combine the result.
+
+loaduser() {
+
+ let request1 = this.http.get('h___');
+ let request2 = this.http.get('htt___');
+
+ forkJoin(request1, request2).subscribe((result) => {
+   console.log(result);
+ })
+}
+Page 44 — Callback Functions in Observers
+
+Types of callback function in observes
+
+Handled data :
+
+It execute when next data packet has been emitted by the observables.
+
+Handleerror callback :
+
+It execute when error emitted by the observable.
+
+This is invoked then observable stream ends, that means no other callback function are invoked further.
+
+Handle completion callback :
+
+It execute when observable indicates stream completion.
+
+If this is invoked, the observable stream ends, that means no other callback function are invoked further.
+
+
+
+- ====================================================================================================
+
+
+In RxJS (used with Angular), operators like switchMap, mergeMap, concatMap, and exhaustMap are used to map values from an observable into a new inner observable and manage the emissions. These operators deal with higher-order observables (observables emitting observables) and control how the emissions from multiple inner observables are handled.
+
+
+
+
+Here's the key difference between them:
+
+1. switchMap:
+
+- Behavior: Bunch of values are emitted quickly switch map only cares about latest one and ignore the rest. 
+
+- It unsubscribes from the previous inner observable and subscribes to the new one whenever a new value is emitted from the source observable.
+
+* Use case: When you only want to deal with the latest observable and discard the previous one.
+
+- Example: Good for search autocomplete, where you want to cancel the previous search request when the user types a new query.
+
+	typescript
+Copy code
+source$.pipe(
+  switchMap(value => http.get(`/api/data/${value}`))
+);
+
+Scenario: If source$ emits values 1, 2, 3 in quick succession:
+It will cancel the request for 1, then cancel 2, and only complete the request for 3.
+
+
+2. concatMap:
+
+Behavior: 
+- It processes observables sequentially ensuring that the next observable start only after previous one completes. 
+- It is creating a queue of request and handles them one after another.  
+- It subscribes to each inner observable in sequence and waits for each one to complete before subscribing to the next.
+- It guarantees the order of execution.
+
+Use case: When the order of emissions matters, and you want to ensure each inner observable completes before starting the next one.
+
+Example: Useful when making HTTP requests that must happen in a specific order.
+eg2 => Order processing
+
+Suppose you have:
+
+orders = [
+  { id: 101 },
+  { id: 102 },
+  { id: 103 }
+];
+
+You need to process them one by one:
+
+	typescript
+Copy code
+source$.pipe(
+  concatMap(value => http.get(`/api/data/${value}`))
+);
+
+Scenario: If source$ emits values 1, 2, 3:
+It will first complete the request for 1, then start the request for 2, and only after that finishes, it will initiate the request for 3.
+
+3. mergeMap (also known as flatMap):
+
+Behavior: 
+- Unlike concateMap , mergeMap does not wait for the previous call to finish.
+- It emits all request as they comes in and processing them at same time. 
+- It subscribes to each inner observable as it arrives and "merges their results", meaning multiple inner observables can run concurrently.
+
+Use case: When you want to handle multiple ongoing subscriptions concurrently and you don't want to cancel any inner observable.
+
+Example: Useful for scenarios where you trigger multiple async operations that can run in parallel, like making multiple HTTP requests.
+1. Multiple file uploads
+
+User selects 5 files
+        ↓
+mergeMap
+        ↓
+5 upload requests can run
+
+	typescript
+Copy code
+source$.pipe(
+  mergeMap(value => http.get(`/api/data/${value}`))
+);
+
+Scenario: If source$ emits values 1, 2, 3 in quick succession:
+It will initiate three HTTP requests concurrently and combine their results as they complete.
+
+4. exhaustMap:
+
+Behavior: It subscribes to the first inner observable and ignores any new emissions from the source observable until the inner observable completes.
+
+- Use case: When you want to ignore subsequent emissions until the current operation completes. Good for scenarios where you want to prevent the user from triggering multiple actions (e.g., form submission) while one is in progress.
+
+Example: Useful for actions like form submissions, where you don't want to trigger multiple submissions while the first one is still in progress.
+1. Login button
+
+Prevent multiple login requests.
+
+2. Payment button
+
+Pay Now
+
+User clicks 5 times accidentally.
+
+You don't want:
+
+₹1000
+₹1000
+₹1000
+₹1000
+₹1000
+
+exhaustMap can ignore additional clicks while the payment request is active.
+
+3. Form submission
+
+Submit
+Submit
+Submit
+
+Only the first submission is processed while the API is running.
+
+	typescript
+Copy code
+source$.pipe(
+  exhaustMap(value => http.get(`/api/data/${value}`))
+);
+
+Scenario: If source$ emits values 1, 2, 3 while the inner observable from 1 is still active:
+It will process 1, but ignore 2 and 3 until the request for 1 completes.
+
+Summary:
+
+switchMap: Switches to the new observable, canceling the previous one.
+
+mergeMap: Merges multiple observables and runs them concurrently.
+
+concatMap: Processes observables sequentially, waiting for each to complete. 
+
+exhaustMap: Ignores new emissions until the current observable completes.
+
+Each operator is useful depending on how you want to handle the emissions from the observables, concurrency, and timing concerns.
+
+
+
+==================================================================
+In RxJS, Subject is a special type of Observable that can both:
+
+emit values (next())
+subscribe to values
+
+It is mainly used for sharing data/events between components/services in Angular.
+
+1. Subject (Basic Subject)
+
+A normal Subject does not store old values.
+Subscribers only get values emitted after they subscribe.
+
+- Real-Time Example => Chat notification system => If you join late, you only see new messages.
+
+import { Subject } from 'rxjs';
+
+const subject = new Subject();
+
+subject.subscribe(data => {
+  console.log('User 1:', data);
+});
+
+subject.next('Hello');
+
+subject.subscribe(data => {
+  console.log('User 2:', data);
+});
+
+subject.next('Welcome');
+Output
+User 1: Hello
+User 1: Welcome
+User 2: Welcome
+
+Angular Real-Time Use
+Component communication
+Button click events
+Live notifications
+
+2. BehaviorSubject
+
+BehaviorSubject stores the latest value.
+New subscribers immediately receive the current value.
+
+Real-Time Example
+User Login State
+
+When a new component loads, it should instantly know whether the user is logged in.
+
+import { BehaviorSubject } from 'rxjs';
+
+const loginStatus = new BehaviorSubject(false);
+
+loginStatus.subscribe(status => {
+  console.log('Navbar:', status);
+});
+
+loginStatus.next(true);
+
+loginStatus.subscribe(status => {
+  console.log('Dashboard:', status);
+});
+Output
+Navbar: false
+Navbar: true
+Dashboard: true
+
+Dashboard immediately got latest value (true).
+
+Angular Real-Time Use
+Authentication state
+Theme mode (dark/light)
+Shared form data
+Current user data
+
+3. ReplaySubject
+
+ReplaySubject stores multiple previous values.
+
+New subscribers receive old emitted values based on buffer size.
+
+Real-Time Example
+YouTube Playlist History
+
+A new user can see previous songs/videos.
+
+import { ReplaySubject } from 'rxjs';
+
+const replay = new ReplaySubject(2);
+
+replay.next('Video 1');
+replay.next('Video 2');
+replay.next('Video 3');
+
+replay.subscribe(data => {
+  console.log(data);
+});
+Output
+Video 2
+Video 3
+
+Because buffer size = 2.
+
+Angular Real-Time Use
+Chat history
+Notification history
+Undo/Redo functionality
+Recent activity tracking
+4. AsyncSubject
+
+AsyncSubject emits only the last value when completed.
+
+Real-Time Example
+API Request Final Result
+
+You only care about final response after API finishes.
+
+import { AsyncSubject } from 'rxjs';
+
+const asyncSub = new AsyncSubject();
+
+asyncSub.subscribe(data => {
+  console.log(data);
+});
+
+asyncSub.next(1);
+asyncSub.next(2);
+asyncSub.next(3);
+
+asyncSub.complete();
+Output
+3
+
+Only last value emitted after complete().
+
+Angular Real-Time Use
+Final API response
+File upload completion
+Report generation completion
+
+
+Quick Comparison Table
+- Type	                Stores Old Value?	           New Subscriber Gets?	                Best Use Case
+Subject	               ❌  No	                     Only future values	                   Events
+BehaviorSubject	       ✅ Latest value	             Current/latest value	                 Auth state
+ReplaySubject	         ✅ Multiple values	         Previous values	                     History/chat
+AsyncSubject	         ✅ Last value                only after complete Final value	     API final result
+
+Interview Answer (Simple Human Tone)
+
+Subject is a multicast observable in RxJS used for sharing data between components or services.
+There are mainly 4 types:
+
+- Subject → emits only new values
+- BehaviorSubject → stores latest value
+- ReplaySubject → stores multiple previous values
+- AsyncSubject → emits final value after completion
+
+In Angular, BehaviorSubject is most commonly used for authentication state management and shared data services.
+
+Easy Memory Trick
+Type	                                    Memory Trick
+Subject	                                 Live TV
+BehaviorSubject	                         Current score board
+ReplaySubject                           	YouTube history
+AsyncSubject                           	Exam final result only
+
+
+Real Angular Example (Most Important)
+Shared Service Using BehaviorSubject
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  private userName = new BehaviorSubject('Guest');
+
+  currentUser = this.userName.asObservable();
+
+  changeUser(name: string) {
+    this.userName.next(name);
+  }
+}
+Component A
+constructor(private userService: UserService) {}
+
+changeName() {
+  this.userService.changeUser('Gaurav');
+}
+Component B
+constructor(private userService: UserService) {}
+
+ngOnInit() {
+  this.userService.currentUser.subscribe(name => {
+    console.log(name);
+  });
+}
+
+This is one of the most asked Angular interview patterns.
+
+====================================================================
+* What is tap?
+
+tap is an operator from RxJS used inside observables.
+
+👉 It lets you perform side effects without changing the data flowing through the stream.
+
+🔹 Simple Explanation
+- It does NOT modify data It is used for:Logging, Debugging,Triggering extra actions (like loader, analytics, etc.)
+
+🔹 Example in Angular
+import { tap } from 'rxjs/operators';
+
+this.http.get('https://api.example.com/data')
+  .pipe(
+    tap(res => {
+      console.log('API response:', res); // side effect
+    })
+  )
+  .subscribe(data => {
+    this.data = data; // actual data usage
+  });
+🔹 Key Point
+
+👉 tap = "do something with data, but don’t change it"
+
+🔹 Difference vs map (important in interviews)
+Operator	              Purpose
+tap	                    Side effects only (no change in data)
+map	                    Transforms the data
+
+🔹 Real Use Cases
+Show/hide loader before/after API
+Debug API responses
+Logging user actions
+Trigger notifications
+
+===================================================================
+- takeUntil() vs distinctUntilChanged()
+Easiest way to remember
+takeUntil()             → WHEN SHOULD I STOP LISTENING?
+distinctUntilChanged()  → SHOULD I IGNORE THIS DUPLICATE VALUE?
+1. takeUntil() — Stop the subscription
+
+takeUntil() is used to complete/unsubscribe from an Observable when another Observable emits a value.
+
+Angular real-time use case
+
+Suppose component load hote hi API/data stream subscribe kiya:
+
+this.userService.getUsers()
+  .pipe(
+    takeUntil(this.destroy$)
+  )
+  .subscribe(users => {
+    console.log(users);
+  });
+
+And:
+
+private destroy$ = new Subject<void>();
+
+When component destroy hota hai:
+
+ngOnDestroy() {
+  this.destroy$.next();
+  this.destroy$.complete();
+}
+
+Flow:
+
+Component created
+      ↓
+Subscription starts
+      ↓
+Data coming...
+      ↓
+Component destroyed
+      ↓
+destroy$.next()
+      ↓
+takeUntil()
+      ↓
+Subscription completes
+Desi language
+
+"Bhai, jab tak component zinda hai tab tak suno. Component destroy hote hi sunna band kar do."
+
+Interview answer
+
+takeUntil() is used to complete an Observable subscription when a notifier Observable emits a value. In Angular, it is commonly used to clean up subscriptions when a component is destroyed.
+
+2. distinctUntilChanged() — Ignore consecutive duplicates
+
+It checks the current value against the previous emitted value.
+
+Example:
+
+of(10, 10, 20, 20, 30, 30)
+  .pipe(
+    distinctUntilChanged()
+  )
+  .subscribe(value => {
+    console.log(value);
+  });
+
+Output:
+
+10
+20
+30
+
+Because:
+
+10 → emit
+10 → ❌ duplicate
+
+20 → emit
+20 → ❌ duplicate
+
+30 → emit
+30 → ❌ duplicate
+Desi language
+
+"Same value baar-baar aa rahi hai toh mujhe repeat mat batao."
+
+Real Angular Example — Search Box
+
+This is where distinctUntilChanged() is very useful.
+
+this.searchControl.valueChanges
+  .pipe(
+    distinctUntilChanged()
+  )
+  .subscribe(value => {
+    console.log(value);
+  });
+
+Suppose values are:
+
+Angular
+Angular
+Angular
+React
+React
+JavaScript
+
+Without distinctUntilChanged():
+
+Angular
+Angular
+Angular
+React
+React
+JavaScript
+
+With it:
+
+Angular
+React
+JavaScript
+
+So unnecessary processing/API calls can be avoided.
+
+🔥 Very Important Difference
+- takeUntil()	                                                         distinctUntilChanged()
+Controls when subscription stops	                                 Controls which values are emitted
+Uses another Observable as notifier	                                 Compares current value with previous value
+Completes the source subscription	                                 Does NOT complete the subscription
+Mainly used for cleanup	                                 Mainly used to avoid duplicate consecutive values
+Angular component destruction	                                 Search/input/valueChanges
+====================================================================
+
+
+
+
+
+* Schedulers
+
+- In simple terms, schedulers in Angular (or more specifically in RxJS) control when and how things happen in your app when you're working with observables.
+
+- Think of a scheduler as a tool that decides when a task should run (like immediately, after a delay, or in sync with the browser’s rendering cycle). 
+
+- They help manage the "timing and order of actions", especially when you're dealing with asynchronous tasks (e.g., waiting for data from an API, handling user input, animations, etc.).
+
+Why Use Schedulers?
+
+- Schedulers are used to:
+
+* Delay tasks: You might want something to happen a little later, like showing a loading spinner for a moment before displaying the data.
+
+* Control task timing: You can ensure smooth animations or that certain tasks run after others.
+
+* Handle concurrency: In complex apps with multiple tasks, schedulers help ensure they don't all happen at once and block the app.
+
+Example of a Scheduler in Action:
+
+Imagine you want to print a message after a short delay:
+
+	typescript
+Copy code
+import { of, asyncScheduler } from 'rxjs';
+import { observeOn } from 'rxjs/operators';
+
+of('Hello, world!')
+  .pipe(observeOn(asyncScheduler))
+  .subscribe(console.log);  // "Hello, world!" gets printed asynchronously (after the current code finishes)
+  
+Here, asyncScheduler makes sure the message is printed after the current tasks are done, ensuring it doesn’t block the flow of the app.
+
+In short, schedulers help you control when things happen in your app, making it easier to manage asynchronous tasks and ensure your app runs smoothly.
+
+
+There are several types of schedulers in RxJS (used in Angular) that control when and how tasks or events are executed. Each scheduler is suited for different scenarios. Here are the main types:
+
+1. asyncScheduler
+Runs tasks asynchronously using JavaScript's setTimeout.
+
+Useful for deferring tasks or running them later, without blocking the current thread.
+
+Use Case: When you want to delay a task or run it after the current execution stack is complete, such as when fetching data from an API or running a timer.
+
+	typescript
+Copy code
+import { asyncScheduler } from 'rxjs';
+asyncScheduler.schedule(() => console.log('Async Task'), 1000); // Runs after 1 second
+
+
+2. queueScheduler
+Runs tasks synchronously, but schedules them in a first-in, first-out (FIFO) queue.
+
+Helps prevent stack overflow when running recursive tasks or long chains of operations by processing tasks sequentially without blocking.
+
+Use Case: Useful when performing operations in sequence or handling recursive tasks without locking up the browser.
+
+	typescript
+Copy code
+import { of, queueScheduler } from 'rxjs';
+
+of(1, 2, 3, queueScheduler).subscribe(console.log); // Logs values synchronously
+
+3. animationFrameScheduler
+Synchronizes tasks with the browser's repaint cycle using requestAnimationFrame.
+
+Useful for running tasks that involve UI updates or animations so that they occur smoothly in sync with the browser’s frame rendering.
+
+Use Case: Great for animations or tasks that need to happen just before the next browser frame renders.
+
+	typescript
+Copy code
+import { animationFrameScheduler, interval } from 'rxjs';
+
+interval(0, animationFrameScheduler).subscribe(() => {
+  // Update UI elements smoothly in sync with the animation frame
+  console.log('UI updated with animation frame');
+});
+
+
+4. asapScheduler
+Runs tasks asynchronously, but as soon as possible after the current execution stack (similar to setTimeout(0) but faster).
+
+Provides a quick but asynchronous way to execute tasks without blocking other operations.
+
+Use Case: When you need a task to execute right after the current code finishes but without any significant delay.
+
+	typescript
+Copy code
+import { of, asapScheduler } from 'rxjs';
+
+of('ASAP Task', asapScheduler).subscribe(console.log);  // Runs asynchronously but immediately after the current code
+
+
+Summary of Scheduler Types:
+
+Scheduler	Execution	Use Case
+
+asyncScheduler	Asynchronous (with delay)	When you want to defer tasks or run them after a delay.
+
+queueScheduler	Synchronous (FIFO queue)	When you need tasks to run in sequence without blocking the thread.
+
+animationFrameScheduler	Sync with animation frames	For smooth animations or UI updates synchronized with browser frames.
+
+asapScheduler	Asynchronous (immediate)	When you need the task to run immediately after the current stack.
+
+* Each of these schedulers helps you control the timing and behavior of operations in your app, especially when handling asynchronous tasks, ensuring that your app runs smoothly and efficiently.
+
+
+
+
+
+
+
+
+
+
+
+

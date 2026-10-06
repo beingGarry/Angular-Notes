@@ -1,0 +1,181 @@
+
+================================================================================
+TOPIC 3: VAR, LET, AND CONST
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+
+* --- VAR ---
+In JavaScript, variables can be declared using the keyword VAR. The variable declared with VAR can be present GLOBALLY or just inside the FUNCTION (functional scope).
+
+- VAR variables CAN be redeclared and CAN be reassigned without any issues. This gives a flexible but sometimes dangerous environment.
+- VAR variables declared OUTSIDE functions are GLOBAL SCOPE (attached to window).
+- VAR variables declared INSIDE functions are FUNCTIONAL SCOPE.
+
+DO NOT CREATE GLOBAL VARIABLES UNLESS NEEDED because:
+- You can unknowingly override existing variables.
+- Can override window object properties (e.g., 'alert').
+
+var alert = 0
+console.log(window.alert) // 0  <-- window.alert property is overridden!
+
+* --- LET ---
+Introduced in ES6. 
+- Let variables CANNOT be redeclared but CAN be reassigned.
+
+let a = 1;
+let a = 2; // ERROR: Identifier 'a' has already been declared
+
+- The major difference between var and let is that LET has BLOCK SCOPE.
+- If declared inside a block {}, the let variable CANNOT be accessed outside the block.
+- LET variables declared outside function are also global but only accessible in the CURRENT FILE. 
+
+* They do NOT get attached to the window object. They have their own separate memory called Script.
+
+* --- CONST ---
+
+- CONST variables MUST be declared and assigned together. They CANNOT be reassigned and CANNOT be redeclared. 
+The most strict of all three.
+
+const a;        // Error: Missing initializer in const declaration
+const a = 1;
+a = 2;          // Error: Assignment to constant variable.
+const a = 1;
+const a = 2;    // Error: Identifier 'a' has already been declared
+
+SCOPE of CONST is the same as LET - block scope.
+
+
+KEY POINTS SUMMARY
+-------------------
+VAR:
+- Can be redeclared and reassigned
+- Global scope if declared outside function
+- Functional scope if declared inside function
+- Gets attached to window object
+
+LET:
+- Cannot be redeclared but can be reassigned
+- Block scope if declared inside a block
+- Functional scope if declared inside a function
+- Global scope for same file (NOT attached to window)
+
+CONST:
+- Cannot be redeclared, cannot be reassigned
+- Block scope if declared inside a block
+- Functional scope if declared inside a function
+- Global scope for same file (NOT attached to window)
+
+
+EXAMPLES
+---------
+
+// VAR
+var a;
+console.log(a)  // undefined
+var a = 1;
+console.log(a)  // 1
+a = 2;
+console.log(a)  // 2
+var a = 3;
+console.log(a)  // 3
+
+// LET
+let b = 1;
+console.log(b)  // 1
+b = 2;
+console.log(b)  // 2
+let b = 3;      // ERROR: Identifier 'b' has already been declared
+
+// CONST
+const c = 1;
+console.log(c)  // 1
+c = 2;          // ERROR: Assignment to constant variable.
+
+
+SCOPE EXAMPLES
+---------------
+// Block Scope of let
+{
+  let a = 1;
+  const b = 2;
+  var c = 3;
+}
+console.log(a) // error: a is not defined
+console.log(b) // error: b is not defined
+console.log(c) // 3 - var is NOT block scoped
+
+// Functional Scope - all behave the same inside function
+function x(d) {
+  var a = 1;
+  let b = 2;
+  const c = 3;
+  console.log(a, b, c, d); // 1, 2, 3, 4
+}
+x(4);
+console.log(a); // ERROR: a is not defined
+
+
+* UNDECLARED VARIABLES
+---------------------
+- Variables declared WITHOUT var/let/const are global variables no matter where they are declared. They get added to the window object.
+
+function z() {
+  x = 1;
+  console.log('inside function', x) // 1
+}
+z();
+console.log('outside function', x)  // 1
+console.log('accessing window', window.x) // 1
+
+- NOTE: In STRICT MODE, undeclared variables will NOT be present inside the window object.
+
+
+POSSIBLE INTERVIEW Q&A (WITH CODE OUTPUTS)
+--------------------------------------------
+Q1. Problem: var a = 1; var b = 2; a = b; console.log(a); console.log(b);
+A1. Output: 2, 2
+    Reason: var can be reassigned, a gets b's value (2), b stays 2.
+
+Q2. Is the following valid? let a = 1; let a = 2;
+A2. INVALID. Error: Identifier 'a' has already been declared.
+
+Q3. Is the following valid? const a; (just declared, not assigned)
+A3. INVALID. Error: Missing initializer in const declaration.
+
+Q4. What is the output?
+    let a;
+    a++;
+    console.log(a)
+A4. NaN. Reason: a is declared but not assigned, value is undefined.
+    - undefined + 1 = NaN.
+
+Q5. What is the output?
+    a = 1;
+    console.log(a)
+    console.log(window.a)
+A5. 1, 1
+    Reason: Variables declared without var/let/const become global and
+    are added to the window object.
+
+Q6. What is the output?
+    var a = 1;
+    { var a = 2; console.log('Inside', a); }
+    console.log('Outside', a);
+A6. Inside, 2; Outside, 2
+    Reason: var does not have block scope. Same variable is updated.
+
+Q7. What is the output?
+    let a = 1;
+    { let a = 2; console.log('Inside', a); }
+    console.log('Outside', a);
+A7. Inside, 2; Outside, 1
+    Reason: let has block scope. Inner 'a' is different from outer 'a'.
+
+Q8. What is the output?
+    const a = 1;
+    { const a = 2; console.log('Inside', a); }
+    console.log('Outside', a);
+A8. Inside, 2; Outside, 1
+    Same as Q7. const also has block scope.

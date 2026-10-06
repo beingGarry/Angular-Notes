@@ -1,0 +1,100 @@
+================================================================================
+TOPIC 11: CALL STACK
+=========================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+* The CALL STACK is the place where all JavaScript code actually gets executed. The code in the Call Stack gets executed IMMEDIATELY and SYNCHRONOUSLY.The Call Stack is a data structure where all JavaScript code is executed. When an execution context is created, it's pushed into the call stack. When done, it's popped out. It follows LIFO order.
+
+JavaScript is SINGLE-THREADED and SYNCHRONOUS:
+- Single-threaded: Only one statement executes at a time.
+- Synchronous: Statements execute in a particular order (top to bottom).
+- LIFO Order: LAST IN FIRST OUT. The execution context pushed LAST is executed FIRST.
+
+Whenever an Execution Context is CREATED, it gets PUSHED inside the Call Stack.
+When done executing, the Execution Context gets POPPED (deleted) from the stack.
+
+The GLOBAL EXECUTION CONTEXT sits at the BOTTOM of the Call Stack.
+When functions are called, their execution contexts are PUSHED on TOP.
+When functions finish, their contexts are POPPED from the top.
+
+-NOTE: "Maximum call stack size exceeded" error happens in infinite recursion when too many execution contexts are pushed onto the call stack.
+
+
+EXAMPLES
+---------
+
+// Example 1: Simple Code
+var a = 1;
+console.log(1);
+// CALL STACK: GEC created, pushed. Memory Phase: a=undefined. 
+// Code Exec: a=1, console.log(1) runs.
+// GEC deleted -> Call Stack EMPTY.
+
+
+// Example 2: One Function
+var a = 1;
+function z() { console.log(2) }
+z();
+console.log(a);
+// CALL STACK:
+// 1. GEC pushed [a=undefined, z=function def]
+// 2. Code Exec: a=1, z() called -> EC_z PUSHED on top of GEC
+// 3. EC_z: Memory=nothing, Code Exec: 2 logged -> EC_z POPPED
+// 4. Back to GEC: console.log(a) -> 1 logged -> GEC POPPED
+// EMPTY
+
+
+// Example 3: Two Functions
+var a = 1;
+function x(num1) { console.log(num1); }
+function y(num2) { console.log(num2); }
+x(2); y(3); console.log(a);
+
+// CALL STACK progression:
+// [GEC]
+// [GEC, EC_x]  -> EC_x executes (logs 2), then POPPED
+// [GEC]
+// [GEC, EC_y]  -> EC_y executes (logs 3), then POPPED
+// [GEC]        -> console.log(a) logs 1, then GEC POPPED
+// []
+
+
+// Example 4: Nested Functions
+var a = 1;
+function x(num1) {
+  console.log(num1);
+  function y(num2) { console.log(num2); }
+  y(3);
+}
+x(2); console.log(a);
+
+// CALL STACK progression:
+// [GEC]
+// [GEC, EC_x]
+// [GEC, EC_x, EC_y]  -> EC_y executes (logs 3), then POPPED
+// [GEC, EC_x]        -> EC_x finishes, POPPED
+// [GEC]              -> console.log(a) logs 1, GEC POPPED
+// []
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Every JavaScript program uses the call stack.
+- Deep recursion can overflow the call stack.
+- Async code (setTimeout) leaves the call stack and goes to Browser APIs.
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the Call Stack?
+A1. The Call Stack is a data structure where all JavaScript code is executed. When an execution context is created, it's pushed into the call stack. When done, it's popped out. It follows LIFO order.
+
+Q2. What is the execution order in the Call Stack?
+A2. LIFO - Last In, First Out. The most recently added execution context executes first and is removed first.
+
+Q3. What error do you get with infinite recursion?
+A3. "Maximum call stack size exceeded" - too many execution contexts are pushed and the stack overflows.
+
+Q4. How is async code handled if JS is single-threaded?
+A4. Async code (like setTimeout) is handled via Browser APIs/Web APIs. They
+    wait outside the call stack and are pushed back when the call stack is empty.

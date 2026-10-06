@@ -1,0 +1,60 @@
+Architecture of Our B2B Loan Partner Onboarding Application
+Our project follows a layered architecture. Angular is used for the frontend and Node.js is used for the backend APIs. The frontend communicates with the backend through REST APIs.
+
+- The Project followes a component based and service oriented architecture in Angular with api driven commuication between frontend and backend system.
+
+1. 
+ – Angular
+We use Angular for the frontend.
+We have reusable components, routing, guards, services, forms and validations.
+The frontend is responsible for displaying the onboarding screens and handling user interactions.
+
+2. Backend API – Node.js
+We use Node.js for the backend APIs.
+The backend handles the main processing, partner details, onboarding status, document processing and communication with other services.
+
+3. Authentication & Authorization
+We have an authentication layer for login and security.
+After login, we check the user's role and permissions.
+For example, in our CMS we have roles like Admin, Product and Sales. Based on the role, users can perform different operations.
+
+4. Service Layer
+On the Angular side, we use services to communicate with the backend APIs.
+We keep API-related logic and reusable business-related operations in services instead of putting everything inside components.
+We also use services for things like caching and sharing data between components where required.
+
+5. State Management
+We maintain the onboarding state, such as the current stage, partner information, document status and verification status.
+This is also useful for our Resume Journey feature because when the partner comes back, we can continue the onboarding from the appropriate stage.
+
+6. OCR Integration
+When a partner uploads a document, the document goes through the OCR process.
+OCR extracts the required information from the document.
+Based on the OCR result and other verification results, the onboarding process moves forward.
+
+7. Automated & Manual Flow
+We have two main processing flows — Automated Flow and Manual Flow.
+If the required verification is successful and the score is 80 or above, the case continues through the automated flow.
+If the score is below 80 or there is some verification exception, the case goes to the manual flow.
+In the manual flow, internal users can open the case from the CMS portal, verify the information and documents, and then accept, reject or handle the exception.
+
+8. Database & Storage
+We use MySQL as our database to store partner details, onboarding status, verification information and other application data.
+Uploaded documents are handled through the storage layer, while the database maintains the required document-related information and references.
+
+🔥 Now say the whole thing like this in the interview
+Don't memorize eight separate paragraphs. If the interviewer asks:
+"Can you explain the architecture of your project?"
+Say:
+"Sure. Our project follows a layered architecture. We use Angular for the frontend and Node.js for the backend APIs.
+On the frontend, we have reusable Angular components, routing, guards, services, forms and validations. Angular communicates with the Node.js backend through REST APIs.
+We have an authentication and authorization layer for login and role-based access. In our CMS, we have roles like Admin, Product and Sales, and based on their permissions they can perform different operations.
+We use Angular services for API communication and reusable business logic, and we maintain the onboarding state, which also helps us implement the Resume Journey feature.
+For document processing, partners upload documents and they go through OCR. We also have verification processes like IMPS and NSDL. Based on the verification result and score, the onboarding follows either the automated or manual flow.
+If the score is 80 or above, the case continues through the automated flow. If it is below 80 or there is an exception, it goes to the manual flow. Internal users can then handle the case through the CMS portal.
+For data persistence, we use MySQL, and uploaded documents are handled through the storage layer.
+So, in simple terms, the flow is Angular Frontend → Authentication → Node.js APIs → Service/Business Layer → OCR and Verification → Automated or Manual Flow → MySQL and Storage."
+
+🧠 Easy way to remember
+Just remember these 8 words:
+Frontend → Backend → Authentication → Services → State → OCR → Auto/Manual → Database

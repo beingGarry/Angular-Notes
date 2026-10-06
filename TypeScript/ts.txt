@@ -1,0 +1,1018 @@
+- TYPE
+
+* In TypeScript, type is used to create a custom name for a data type.
+
+Think of it like:
+
+“I have a particular type/structure that I will use multiple times, so I'll give it a name.”
+
+1. Simple example
+type UserName = string;
+
+let name: UserName = "Gaurav";
+
+Here:
+
+type UserName = string;
+
+means UserName is another name for string.
+
+So this:
+
+let name: UserName = "Gaurav";
+
+is essentially the same as:
+
+let name: string = "Gaurav";
+2. Most important use — defining object structure
+
+This is where type becomes very useful:
+
+type User = {
+  id: number;
+  name: string;
+  email: string;
+};
+
+Now we can create users:
+
+let user1: User = {
+  id: 101,
+  name: "Gaurav",
+  email: "gaurav@gmail.com"
+};
+
+TypeScript will make sure the object follows the User structure.
+
+For example:
+
+let user1: User = {
+  id: 101,
+  name: "Gaurav"
+};
+
+❌ Error because email is missing.
+
+3. type can combine multiple types
+
+For example, a user can have either an id as a number or a string:
+
+type ID = number | string;
+
+let id1: ID = 101;
+let id2: ID = "EMP101";
+
+This is called a Union Type.
+
+number | string
+     ↑
+    OR
+
+So:
+
+type ID = number | string;
+
+means:
+
+ID can be number OR string.
+
+4. type with literal values
+
+You can restrict a variable to specific values:
+
+type Status = "success" | "error" | "loading";
+
+let status: Status;
+
+status = "success";  // ✅
+status = "error";    // ✅
+status = "loading";  // ✅
+
+status = "pending";  // ❌
+
+This is very useful in Angular applications.
+
+For example:
+
+type ButtonType = "primary" | "secondary" | "danger";
+
+Now:
+
+let button: ButtonType = "primary"; // ✅
+
+but:
+
+let button: ButtonType = "green"; // ❌
+5. type with functions
+
+You can also define the structure of a function:
+
+type AddFunction = (a: number, b: number) => number;
+
+Then:
+
+const add: AddFunction = (a, b) => {
+  return a + b;
+};
+
+Here AddFunction says:
+
+Function
+   ↓
+takes number, number
+   ↓
+returns number
+type vs interface
+
+This is a very common interview question.
+
+Both can describe objects:
+
+type User = {
+  name: string;
+  age: number;
+};
+
+and:
+
+interface User {
+  name: string;
+  age: number;
+}
+
+For basic object structures, they are very similar.
+
+But type is more flexible for things like unions, intersections, primitive aliases, and tuples.
+
+type ID = string | number;
+
+You can't do this directly with an interface.
+
+Easy interview way to remember
+
+* Interface → mainly used to define object structures.
+
+* Type → more flexible; can define objects, unions, primitives, tuples, functions, etc.
+
+For Angular, you'll commonly see both:
+
+interface User {
+  id: number;
+  name: string;
+}
+
+and:
+
+type Status = "loading" | "success" | "error";
+One-line definition for interview
+
+TypeScript's type keyword allows us to create a custom type or type alias that can represent primitives, objects, unions, intersections, functions, tuples, and other types.
+
+# ============================================================================================================
+
+TypeScript — Type Inference
+
+Type inference means TypeScript can automatically figure out the type of a variable without us explicitly writing the type.
+
+Think of it like:
+
+You give TypeScript a value → TypeScript understands its type automatically.
+
+1. Basic example
+let name = "Gaurav";
+let age = 27;
+let isDeveloper = true;
+
+We didn't write:
+
+let name: string = "Gaurav";
+let age: number = 27;
+let isDeveloper: boolean = true;
+
+But TypeScript automatically understands:
+
+name          → string
+age           → number
+isDeveloper   → boolean
+
+That's type inference.
+
+2. Why is it useful?
+
+Because you don't have to unnecessarily write types everywhere.
+
+let company = "Bajaj";
+
+TypeScript knows:
+
+company → string
+
+Therefore:
+
+company = 123;
+
+❌ Error.
+
+Because TypeScript inferred company as string.
+
+3. Function return type inference
+
+TypeScript can also infer the return type of a function.
+
+function add(a: number, b: number) {
+  return a + b;
+}
+
+We didn't write:
+
+function add(a: number, b: number): number
+
+But TypeScript understands that:
+
+add() → number
+
+because:
+
+a + b
+
+produces a number.
+
+4. Array inference
+let numbers = [10, 20, 30, 40];
+
+TypeScript infers:
+
+numbers → number[]
+
+So:
+
+numbers.push(50);    // ✅
+numbers.push("100"); // ❌
+
+Because the array was inferred as number[].
+
+Similarly:
+
+let names = ["Gaurav", "Rahul", "Amit"];
+
+TypeScript infers:
+
+names → string[]
+5. Object inference
+let user = {
+  name: "Gaurav",
+  age: 27
+};
+
+TypeScript automatically understands:
+
+user
+ ├── name → string
+ └── age  → number
+
+Therefore:
+
+user.name = "Rahul"; // ✅
+user.age = 30;       // ✅
+
+user.age = "30";     // ❌
+6. const vs let inference
+
+This is an important interview point.
+
+let status = "success";
+
+TypeScript generally infers:
+
+status → string
+
+Because let can be reassigned:
+
+status = "error"; // ✅
+
+But with:
+
+const status = "success";
+
+TypeScript can infer the more specific literal type:
+
+status → "success"
+
+because const cannot be reassigned.
+
+7. Function parameter inference
+
+Be careful here.
+
+TypeScript doesn't always infer function parameters.
+
+For example:
+
+function greet(name) {
+  return "Hello " + name;
+}
+
+With normal TypeScript settings, name will generally be treated as any and can produce an implicit-any error when noImplicitAny is enabled.
+
+So you should write:
+
+function greet(name: string) {
+  return "Hello " + name;
+}
+
+But TypeScript can infer parameters in a contextual situation:
+
+const names = ["Gaurav", "Rahul"];
+
+names.forEach(name => {
+  console.log(name);
+});
+
+Here TypeScript knows:
+
+name → string
+
+because names is string[].
+
+Type Inference vs Explicit Type
+Explicit type
+
+You tell TypeScript the type:
+
+let age: number = 27;
+Type inference
+
+TypeScript figures it out:
+
+let age = 27;
+
+Both result in:
+
+age → number
+Interview answer ⭐
+
+* Type inference is a TypeScript feature where the compiler automatically determines the type of a variable, function return value, or expression based on the value or context, so we don't always need to explicitly specify the type.
+
+Easy way to remember
+Explicit typing:
+You tell TypeScript
+        ↓
+let age: number = 27;
+
+
+Type inference:
+TypeScript figures it out
+        ↓
+let age = 27;
+        ↓
+     number
+
+In short:
+
+Inference = TypeScript guesses the type from context/value.
+
+
+- TypeScript Data Types
+
+TypeScript types can roughly be divided into:
+
+TypeScript Types
+│
+├── Primitive Types
+│   ├── string
+│   ├── number
+│   ├── boolean
+│   ├── null
+│   ├── undefined
+│   ├── bigint
+│   └── symbol
+│
+├── Special Types
+│   ├── any
+│   ├── unknown
+│   ├── void
+│   └── never
+│
+└── Non-Primitive / Structured Types
+    ├── object
+    ├── Array
+    ├── Tuple
+    ├── Enum
+    ├── Function
+    └── Custom types / interfaces
+1. string
+
+Used for text.
+
+let name: string = "Gaurav";
+let company: string = "Bajaj";
+
+Only strings are allowed:
+
+name = "Rahul"; // ✅
+name = 100;     // ❌
+2. number
+
+Used for numbers.
+
+TypeScript doesn't separate int, float, double, etc.
+
+let age: number = 27;
+let salary: number = 70000;
+let percentage: number = 95.5;
+
+All are number.
+
+let x: number = 10;
+let y: number = 10.5;
+
+Both are valid.
+
+3. boolean
+
+Only true or false.
+
+let isLoggedIn: boolean = true;
+let isAdmin: boolean = false;
+isLoggedIn = true;  // ✅
+isLoggedIn = false; // ✅
+isLoggedIn = 1;     // ❌
+4. null
+
+Represents an intentional absence of a value.
+
+let selectedUser: null = null;
+
+More commonly you'll see it combined with another type:
+
+let user: string | null = null;
+
+user = "Gaurav"; // ✅
+user = null;    // ✅
+
+This is very common when working with APIs.
+
+For example:
+
+let userName: string | null = null;
+
+Meaning:
+
+userName can contain a string OR no value.
+
+5. undefined
+
+Means a value hasn't been assigned.
+
+let result: undefined = undefined;
+
+Example:
+
+let name: string | undefined;
+
+console.log(name);
+
+The value is initially:
+
+undefined
+
+You'll commonly see it with optional properties:
+
+type User = {
+  name: string;
+  age?: number;
+};
+
+Here age can be:
+
+number | undefined
+6. any ⚠️
+
+any basically tells TypeScript:
+
+"Don't check this value's type."
+
+let data: any = "Gaurav";
+
+data = 100;
+data = true;
+data = {};
+data = [];
+
+Everything is allowed.
+
+let data: any = "Hello";
+
+data.toUpperCase(); // TypeScript allows it
+
+But this can cause runtime errors:
+
+let data: any = 100;
+
+data.toUpperCase(); // TypeScript doesn't complain
+
+At runtime:
+
+❌ data.toUpperCase is not a function
+Remember:
+
+any = I don't want TypeScript to check this.
+
+Generally, avoid any unless there's a good reason.
+
+7. unknown ⭐ VERY IMPORTANT
+
+This is the one you specifically asked about.
+
+unknown means:
+
+"I don't know what type this value will be, so TypeScript, don't let me use it until I check its type."
+
+Example:
+
+let data: unknown;
+
+data = "Gaurav";
+data = 100;
+data = true;
+
+All of these are allowed.
+
+But now:
+
+let data: unknown = "Gaurav";
+
+data.toUpperCase();
+
+❌ TypeScript error.
+
+Why?
+
+Because TypeScript doesn't know whether data is a string.
+
+It could be:
+
+string
+number
+boolean
+object
+array
+etc.
+
+So you need to check the type first.
+
+let data: unknown = "Gaurav";
+
+if (typeof data === "string") {
+  console.log(data.toUpperCase());
+}
+
+Now TypeScript knows:
+
+data
+ ↓
+string
+
+Therefore:
+
+data.toUpperCase();
+
+is allowed.
+
+unknown vs any
+
+This is one of the most important TypeScript interview questions.
+
+any
+let data: any = "Gaurav";
+
+data.toUpperCase();
+data.someRandomFunction();
+data.xyz.abc;
+
+TypeScript doesn't care.
+
+unknown
+let data: unknown = "Gaurav";
+
+data.toUpperCase(); // ❌
+
+You must check first:
+
+if (typeof data === "string") {
+  data.toUpperCase(); // ✅
+}
+Easy comparison
+- any                                           	unknown
+Disables type checking	                       Maintains type safety
+Can use directly	                            Must check before use
+Less safe	                                       Safer
+Avoid when possible	                           Preferred for truly unknown data
+
+Remember this sentence for interview:
+
+- unknown is a type-safe alternative to any. We can assign any value to an unknown variable, but we must perform type checking or narrowing before using that value.
+
+8. void
+
+void is mostly used for functions that don't return a value.
+
+function printMessage(): void {
+  console.log("Hello");
+}
+
+The function performs an operation but doesn't return anything.
+
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+Here:
+
+add() → number
+
+But:
+
+function printMessage(): void {
+  console.log("Hello");
+}
+
+means:
+
+printMessage() → no useful return value
+9. never ⭐
+
+never represents something that never successfully completes.
+
+Most commonly, a function that always throws an error:
+
+function throwError(): never {
+  throw new Error("Something went wrong");
+}
+
+The function never reaches a normal return.
+
+Another example:
+
+function infiniteLoop(): never {
+  while (true) {
+    console.log("Running...");
+  }
+}
+
+It never finishes.
+
+void vs never
+
+This is important.
+
+function test1(): void {
+  console.log("Hello");
+}
+
+The function finishes normally but returns nothing.
+
+function test2(): never {
+  throw new Error("Error");
+}
+
+The function never completes normally.
+
+void
+ ↓
+Function finishes
+ ↓
+No return value
+
+
+never
+ ↓
+Function never completes normally
+10. bigint
+
+Used for very large integers.
+
+let bigNumber: bigint = 123456789012345678901234567890n;
+
+Notice the:
+
+n
+
+at the end.
+
+let x: bigint = 100n;
+
+You cannot normally mix number and bigint directly:
+
+let x = 10;
+let y = 20n;
+
+// x + y ❌
+11. symbol
+
+symbol creates a unique value.
+
+let id1 = Symbol("id");
+let id2 = Symbol("id");
+
+console.log(id1 === id2);
+
+Result:
+
+false
+
+Even though both have "id" as the description, each Symbol is unique.
+
+Symbols are useful when you need unique property keys or identifiers.
+
+12. object
+
+object represents non-primitive values.
+
+For example:
+
+let user: object = {
+  name: "Gaurav",
+  age: 27
+};
+
+Arrays are also objects:
+
+let numbers: object = [1, 2, 3];
+
+Functions are also objects in JavaScript.
+
+However, don't confuse:
+
+object
+
+with:
+
+Object
+
+or:
+
+{}
+
+For normal application code, specific object types are usually better.
+
+13. Arrays
+
+Arrays contain multiple values.
+
+Syntax 1
+let numbers: number[] = [10, 20, 30];
+Syntax 2
+let numbers: Array<number> = [10, 20, 30];
+
+Both mean the same thing.
+
+For strings:
+
+let names: string[] = ["Gaurav", "Rahul", "Amit"];
+
+Objects:
+
+type User = {
+  name: string;
+  age: number;
+};
+
+let users: User[] = [
+  {
+    name: "Gaurav",
+    age: 27
+  },
+  {
+    name: "Rahul",
+    age: 28
+  }
+];
+
+This is extremely common in Angular when handling API response lists.
+
+14. Tuple ⭐
+
+A tuple is an array where:
+
+The number, order, and types of elements are fixed.
+
+Example:
+
+let user: [number, string] = [101, "Gaurav"];
+
+Meaning:
+
+Position 0 → number
+Position 1 → string
+
+So:
+
+let user: [number, string] = [101, "Gaurav"]; // ✅
+
+But:
+
+let user: [number, string] = ["Gaurav", 101]; // ❌
+
+because the order is wrong.
+
+Another example:
+
+let employee: [number, string, boolean] = [
+  101,
+  "Gaurav",
+  true
+];
+
+15. Enum
+
+Enums allow us to define a set of named constants.
+
+enum Role {
+  Admin,
+  User,
+  Guest
+}
+
+Now:
+
+let role: Role = Role.Admin;
+
+Enums can also have explicit values:
+
+enum Status {
+  Success = 200,
+  NotFound = 404,
+  ServerError = 500
+}
+
+Then:
+
+let status: Status = Status.Success;
+
+Interview note: Modern TypeScript code often uses string literal unions instead of enums when an enum's runtime object isn't needed:
+
+type Status = "success" | "error" | "loading";
+
+16. Union Type ⭐
+
+Union means OR.
+
+let id: number | string;
+
+Now both are allowed:
+
+id = 101;      // ✅
+id = "EMP101"; // ✅
+
+But:
+
+id = true; // ❌
+
+because:
+
+number | string
+      ↑
+     OR
+17. Intersection Type
+
+Intersection means AND.
+
+Suppose:
+
+type Person = {
+  name: string;
+};
+
+type Employee = {
+  employeeId: number;
+};
+
+We can combine them:
+
+type EmployeeDetails = Person & Employee;
+
+Now:
+
+let employee: EmployeeDetails = {
+  name: "Gaurav",
+  employeeId: 101
+};
+
+So:
+
+Person
+  +
+Employee
+  ↓
+EmployeeDetails
+18. Literal Types
+
+A literal type allows only a specific value.
+
+let direction: "left" | "right" | "up" | "down";
+
+Now:
+
+direction = "left";  // ✅
+direction = "right"; // ✅
+direction = "hello"; // ❌
+
+Very useful for status values:
+
+type Status = "loading" | "success" | "error";
+19. Function Type
+
+You can define the type/signature of a function.
+
+type Add = (a: number, b: number) => number;
+
+Then:
+
+const add: Add = (a, b) => {
+  return a + b;
+};
+
+Meaning:
+
+Add
+ ↓
+takes number
+takes number
+ ↓
+returns number
+Most Important Types for Your Angular Interview
+
+Don't try to memorize everything equally. Focus especially on these:
+
+string
+number
+boolean
+array
+object
+type
+interface
+any
+unknown ⭐
+void
+never
+union ⭐
+intersection
+tuple
+enum
+
+And understand these three particularly well:
+
+any
+let data: any = "hello";
+
+data.xyz(); // TypeScript allows it
+
+No type safety.
+
+unknown
+let data: unknown = "hello";
+
+data.toUpperCase(); // ❌
+
+if (typeof data === "string") {
+  data.toUpperCase(); // ✅
+}
+
+Type-safe unknown value.
+
+never
+function error(): never {
+  throw new Error("Error");
+}
+
+Function never completes normally.
+
+🧠 Super-easy memory trick
+any
+ ↓
+"Do whatever you want"
+❌ Type safety
+
+
+unknown
+ ↓
+"I don't know what it is"
+ ↓
+"Check it first"
+✅ Type safety
+
+
+void
+ ↓
+"Function returns nothing"
+
+
+never
+ ↓
+"Function never finishes normally"
+Interview question: "What is the difference between any and unknown?"
+
+A strong simple answer:
+
+Both can hold values of any type, but any disables TypeScript's type checking, while unknown doesn't. With unknown, we must perform type narrowing, such as typeof or instanceof, before accessing properties or calling methods. Therefore, unknown is safer than any.

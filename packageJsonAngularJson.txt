@@ -1,0 +1,224 @@
+
+
+- VersionsFile                	Main Purpose
+
+package.json	                Defines project dependencies, scripts, and project metadata
+
+package-lock.json	            Locks the exact versions of installed dependencies
+
+angular.json	                Configures the Angular CLI/build system
+
+
+
+1. package.json
+
+This is the main configuration file for your Node/Angular project.
+
+Example:
+
+{
+  "name": "my-angular-app",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test"
+  },
+  "dependencies": {
+    "@angular/core": "^20.0.0",
+    "@angular/common": "^20.0.0",
+    "@angular/router": "^20.0.0"
+  },
+  "devDependencies": {
+    "@angular/cli": "^20.0.0",
+    "typescript": "~5.8.0"
+  }
+}
+Important sections
+
+scripts
+
+"scripts": {
+  "start": "ng serve",
+  "build": "ng build",
+  "test": "ng test"
+}
+
+So:
+
+npm start
+
+runs:
+
+ng serve
+
+dependencies
+
+Packages required by the application at runtime.
+
+For example:
+
+"dependencies": {
+  "@angular/core": "...",
+  "@angular/common": "...",
+  "rxjs": "..."
+}
+
+When you run:
+
+npm install => these packages are installed.
+
+devDependencies => Packages mainly required during development/build/testing.
+
+Example:
+
+"devDependencies": {
+  "@angular/cli": "...",
+  "typescript": "..."
+}
+Interview answer
+
+"package.json contains project metadata, npm scripts, and the dependencies and development dependencies required by the Angular project."
+
+2. package-lock.json
+
+This is generated/maintained by npm.
+
+Suppose package.json says:
+
+"@angular/core": "^20.0.0"
+
+The ^ means npm can potentially install a compatible newer version.
+
+package-lock.json records the exact dependency versions resolved for the installation, along with dependency relationships and integrity information.
+
+For example, conceptually:
+
+{
+  "packages": {
+    "node_modules/@angular/core": {
+      "version": "20.1.5",
+      "resolved": "...",
+      "integrity": "sha512-..."
+    }
+  }
+}
+Why is it useful?
+
+Imagine:
+
+Developer A
+     ↓
+npm install
+     ↓
+Angular dependency version X
+
+
+Developer B
+     ↓
+npm install
+     ↓
+same locked dependency version X
+
+This helps make installations more reproducible across developers, CI/CD, and deployment environments.
+
+Important interview point
+
+Don't say:
+
+"package-lock.json contains all the dependencies."
+
+A better answer:
+
+"package.json declares the dependencies, while package-lock.json records the exact dependency tree and resolved versions so npm can reproduce the installation consistently."
+
+3. angular.json
+
+This file is specifically for Angular CLI configuration.
+
+Example:
+
+{
+  "projects": {
+    "my-app": {
+      "architect": {
+        "build": {
+          "options": {
+            "outputPath": "dist/my-app",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.css"
+            ],
+            "scripts": []
+          }
+        },
+        "serve": {
+          "options": {
+            "buildTarget": "my-app:build"
+          }
+        }
+      }
+    }
+  }
+}
+
+It tells Angular CLI things like:
+
+How to build the application
+Where the application entry point is
+Where assets are located
+Which global CSS files to load
+Which global JavaScript files to load
+Build configurations
+Production/development settings
+Serve configuration
+Test configuration
+Example: Global CSS
+
+Suppose you have:
+
+src/styles.css
+
+You can configure:
+
+"styles": [
+  "src/styles.css"
+]
+
+Angular CLI includes it globally.
+
+Similarly:
+
+"scripts": [
+  "src/assets/some-library.js"
+]
+
+can configure global scripts.
+
+Easy way to remember all 3
+package.json
+      ↓
+"What packages does my project need?"
+"What npm commands can I run?"
+
+package-lock.json
+      ↓
+"Which exact dependency versions were installed?"
+
+angular.json
+      ↓
+"How should Angular CLI build/run/configure my project?"
+Interview answer
+
+* package.json defines the project's dependencies, dev dependencies, scripts, and metadata.
+
+* package-lock.json locks the resolved dependency tree and exact versions to make installations reproducible.
+
+* angular.json contains Angular CLI configuration such as build, serve, assets, styles, scripts, and different build configurations.
+
+

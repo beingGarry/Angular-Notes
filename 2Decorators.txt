@@ -1,0 +1,52 @@
+Page 12 — Angular Decorators / Class Decorators
+
+Are function that are used to modify the behavior of classes and their members.
+
+It is used to define component, service, directive, pipe, modules.
+
+What Angular decorators do
+The whole purpose of decorator is to store metadata about class, method and property.
+When you provide a configure the component, you are providing a metadata for the class that tells the angular that you have component and that component has specific configuration.
+Each decorator has base configuration with some default value.
+
+Four type of decorators.
+
+class decorator :
+class decorators are top level decorators that are used to define purpose for the class.
+They provide information to angular that a particular class is a component or module.
+
+e.g
+
+@Component({
+ selector : '',
+ template :
+})
+
+@directive , @ngmodule , @injectable.
+
+Page 13 — Property / Method / Parameter Decorators
+
+Property Decorators :
+
+This decorators are applied to the class properties and are commonly used to modify the properties within the class.
+
+e.g @input decorator makes a property as an input binding, allowing it to bound to the external data.
+
+@output, @ViewChild()
+
+Method Decorators :
+
+Are used to decorate a method defined inside any class with functionality.
+
+e.g @HostListener()
+
+Parameter decorators —
+
+Are applied to the constructor parameter of the class and are used when we need to tell angular to inject a particular provider in constructor.
+
+e.g
+
+class {
+
+ constructor(@inject(exampleService) exm)
+}

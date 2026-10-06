@@ -1,0 +1,99 @@
+— Pipes / Pure Pipe
+
+Subject is like turbocharge observable. It can almost be thought of an event message pump to that everytime a value is emmited.
+
+PIPES
+Angular pipes are way to transform the format of output data for display.
+They do not alter the data but change into the required format to display in the browser.
+By default pipes in Angular are pure pipes
+
+Custom pipe can be defined as pure pipe by turning the pure flag to true of the @pipe decorator.
+
+Pure Pipe :
+
+Pure pipe is only called when angular detect change in the value or the parameter passed to a pipe.
+
+They are only executed when input values are changed, meaning they are not executed on every change detection cycle.
+@Pipe({
+ name : "PluralRule",
+ pure : true
+})
+
+Page 31 — Impure Pipes
+
+Impure Pipes :
+
+On other hand impure pipe are executed on every change detection cycle, regardless of whether the input value has changed.
+
+Impure pipe are useful when the output is dependent on some external state or value is composite object.
+@pipe({
+ name : 'filterPipe',
+ pure : false.
+})
+Use impure pipe when the transformation might change due to factors other than the input value, such as mutable objects or when working with array/object that may change internally.
+
+e.g Filtering a list of items.
+
+@pipe({
+ name : 'impurefilter',
+ pure : false
+})
+
+export class ImpureFilterpipe implement PipeTransform {
+
+ transform(item : any[], searchText : String): any[] {
+
+   if(!item || !searchText) {
+     return item;
+   }
+
+   return item.filter(item => item.name.indexOf(searchText) !== -1)
+ }
+}
+Page 32 — Steps to Create Custom Pipe
+
+steps to create Custom PIPE
+Generate the pipe
+ng g pipe custom
+
+custom.pipe.ts and custom.spec.ts.
+
+↓
+
+Define pipe
+
+In custom pipe define transformation logic
+
+↓
+
+Use the pipe in template
+
+e.g Creating a pipe to capitalize Text:
+
+Ng generate pipe capitalize.
+Define the pipe in capitalize.pipe.ts to include transformation logic
+@Pipe({
+ Name : 'capitalize',
+})
+
+export class CapitalizePipe implements PipeTransform {
+
+ transform(value : string) : string {
+
+   if(!value) return value;
+
+   return value.charAt(0).toUpperCase() +
+   value.slice(1).toLowerCase();
+ }
+}
+Page 33 — Use Pipe in Template
+
+Use the pipe in template
+<p> {{ 'hello world' | capitalize }} </p>
+
+It will transform the string ‘hello world’ to ‘Hello world’.
+
+generate pipe
+edit pipe file
+Register the pipe in AppModule
+Use the pipe in template

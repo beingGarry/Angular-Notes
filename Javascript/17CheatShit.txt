@@ -1,0 +1,149 @@
+================================================================================
+QUICK REFERENCE CHEAT SHEET
+================================================================================
+
+VAR vs LET vs CONST:
+---------------------
+Feature         | var           | let           | const
+----------------|---------------|---------------|---------------
+Redeclare       | YES           | NO            | NO
+Reassign        | YES           | YES           | NO
+Block Scope     | NO            | YES           | YES
+Func Scope      | YES           | YES           | YES
+Hoisted         | YES (undef)   | YES (TDZ)     | YES (TDZ)
+Window attach   | YES           | NO            | NO
+
+
+SHALLOW vs DEEP COPY:
+----------------------
+Method                  | Level 1 | Nested
+------------------------|---------|--------
+Assignment (=)          | Shallow | Shallow
+Spread (...)            | Deep    | Shallow
+Object.assign({}, obj)  | Deep    | Shallow
+JSON.parse(JSON.stringify) | Deep | Deep (but no functions/dates)
+lodash _cloneDeep       | Deep    | Deep (ALL types)
+
+
+CALL vs APPLY vs BIND:
+-----------------------
+Method  | Invokes immediately | Args format      | Returns
+--------|---------------------|------------------|------------------
+Call    | YES                 | comma-separated  | function result
+Apply   | YES                 | array            | function result
+Bind    | NO                  | comma-separated  | function copy
+
+
+THIS keyword reference:
+------------------------
+Context                          | THIS value
+---------------------------------|------------------
+Alone                            | window object
+Regular function (non-strict)    | window object
+Regular function (strict mode)   | undefined
+Arrow function (anywhere)        | window object
+Object method (regular)          | the object
+Object method (arrow)            | window object
+Event handler                    | the triggering element
+Constructor (new keyword)        | newly created object
+With call/apply/bind             | whatever you pass
+
+
+RECURSION - 3 CRITICAL PARTS:
+------------------------------
+1. BASE CONDITION - stops recursive calls
+2. FUNCTION CALL - placed at correct position
+3. RIGHT ARGUMENTS - must lead to base condition eventually
+
+
+SCOPE TYPES:
+-------------
+- Global Scope: accessible anywhere (var outside function = window object)
+- Block Scope: let/const inside {} - only accessible inside {}
+- Functional Scope: all var/let/const inside function - only inside function
+- Loop Scope: var accessible outside loop, let NOT accessible outside loop
+
+
+SCOPE CHAIN: child -> parent -> grandparent -> window
+(JavaScript searches in this direction, NEVER parent -> child)
+
+
+EXECUTION CONTEXT:
+- Memory Phase: variables = undefined, functions = full definition
+- Code Execution Phase: assign values, call functions
+- New EC created for EACH function call
+- EC destroyed when function finishes
+
+
+CALL STACK: LIFO (Last In First Out)
+- GEC at bottom
+- Function ECs pushed on top as functions are called
+- Popped when functions finish
+
+
+CLOSURE:
+- Inner function can access outer function's variables EVEN AFTER outer finishes
+- Closure holds REFERENCE (not snapshot) to variables
+- Only USED variables are in closure object
+- Call/Apply/Bind CANNOT change THIS in arrow functions
+
+
+CALLBACK HELL:
+- Deeply nested callbacks
+- Code grows horizontally (pyramid shape)
+- Solution: Promises or async/await
+
+
+SETTIMEOUT KEY POINTS:
+- Minimum delay guarantee (NOT exact)
+- Even with 0ms, executes AFTER current synchronous code
+- for + var + setTimeout = classic bug (all print last value)
+- Fix: use let OR wrap in closure function
+
+PROMISE STATES:
+   Pending -> undefined value, waiting
+   Fulfilled -> resolve() called, has value
+   Rejected -> reject() called, has error reason
+
+PROMISE CREATION RULES:
+   - Promise creation callback is SYNCHRONOUS.
+   - resolve() / reject() are ASYNCHRONOUS.
+   - Only FIRST of resolve/reject is honored. Second is IGNORED.
+   - Param NAME doesn't matter, ORDER does. First = resolve, Second = reject.
+
+PROMISE CHAINING:
+   promise.then().then().then().catch()
+   Code grows VERTICALLY (vs callback hell which grows HORIZONTALLY).
+
+PROMISE METHODS:
+   Promise.all()        -> All must resolve, one fail = all fail. => Returns Array of values.
+   Promise.allSettled() -> All settle, shows every outcome. => Returns Array of objects.
+   Promise.race()       -> First to settle (win or lose) wins.=> Returns One value.
+   Promise.any()        -> First to FULFILL wins. =>  Ignores rejections unless all fail.
+   Promise.finally()    -> Always runs, no args, cleanup only.
+
+EMPTY ARRAY BEHAVIOR:
+   Promise.all([])       -> Resolved with []
+   Promise.race([])      -> Pending FOREVER
+   Promise.any([])       -> AggregateError: All promises were rejected
+
+ASYNC/AWAIT RULES:
+   async function  -> ALWAYS returns a promise (wraps return value).
+   await           -> ONLY inside async. Extracts resolved value.
+   await hit       -> Function LEAVES call stack (non-blocking).
+   await done      -> Function RETURNS to call stack, continues.
+
+EXECUTION ORDER (Event Loop):
+   1. Synchronous code (Call Stack)
+   2. Microtask Queue (Promise .then, async/await continuations)
+   3. Callback Queue (setTimeout, setInterval, DOM events)
+
+KEY INTERVIEW TRAPS:
+   - Promise creation = SYNC. resolve/reject = ASYNC.
+   - First resolve/reject call wins. Second is IGNORED.
+   - Param ORDER not name: (reject, resolve) -> first param is still resolve!
+   - Promises (microtasks) ALWAYS run before setTimeout (macrotasks).
+   - await does NOT block JS. Function leaves stack, stack stays free.
+   - Code AFTER await in same function ALSO waits (unlike .then promises).
+   - Returning from .catch() allows NEXT .then to run with that returned value.
+   - throw inside .then behaves like reject() -> goes to .catch.

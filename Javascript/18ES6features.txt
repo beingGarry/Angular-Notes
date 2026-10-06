@@ -1,0 +1,294 @@
+ES6 Features (Interview Ready)
+
+ES6 (ECMAScript 2015) introduced many modern JavaScript features that make code cleaner and easier to maintain.
+
+1. let and const
+let
+
+Block-scoped variable that can be reassigned.
+
+let age = 25;
+
+age = 26;
+const
+
+Cannot be reassigned.
+
+const name = 'Gaurav';
+Difference from var
+if (true) {
+  let x = 10;
+}
+
+// console.log(x); // Error
+
+let and const are block scoped, while var is function scoped.
+
+2. Arrow Functions
+
+Shorter syntax for functions.
+
+const add = (a, b) => a + b;
+
+Instead of:
+
+function add(a, b) {
+  return a + b;
+}
+Important
+
+Arrow functions do not have their own this. They inherit this from the surrounding scope.
+
+const user = {
+  name: 'Gaurav',
+
+  showName: function () {
+    setTimeout(() => {
+      console.log(this.name);
+    }, 1000);
+  }
+};
+3. Template Literals
+
+Use backticks ` to create strings.
+
+const name = 'Gaurav';
+
+console.log(`Hello ${name}`);
+
+Output:
+
+Hello Gaurav
+
+Supports multi-line strings:
+
+const message = `
+Hello
+Welcome
+`;                                                                                                                                             `
+
+4. Default Parameters
+
+Provide default values to function parameters.
+
+function greet(name = 'Guest') {
+  console.log(`Hello ${name}`);
+}
+
+greet();
+
+Output:
+
+Hello Guest
+5. Destructuring
+
+Extract values from arrays or objects.
+
+Object Destructuring
+const user = {
+  name: 'Gaurav',
+  age: 25
+};
+
+const { name, age } = user;
+Array Destructuring
+const numbers = [10, 20, 30];
+
+const [first, second] = numbers;
+6. Spread Operator (...)
+
+Expands elements.
+
+Array
+const arr1 = [1, 2, 3];
+
+const arr2 = [...arr1, 4, 5];
+
+console.log(arr2);
+
+Output:
+
+[1, 2, 3, 4, 5]
+Object
+const user = {
+  name: 'Gaurav'
+};
+
+const updatedUser = {
+  ...user,
+  age: 25
+};
+7. Rest Parameters (...)
+
+Collect multiple values into an array.
+
+function sum(...numbers) {
+  return numbers.reduce(
+    (total, num) => total + num,
+    0
+  );
+}
+
+console.log(sum(1, 2, 3, 4));
+
+Output:
+
+10
+Spread vs Rest
+Spread → Expands values
+Rest   → Collects values
+
+8. Classes
+
+ES6 introduced a cleaner syntax for creating classes.
+
+class Person {
+
+  constructor(name) {
+    this.name = name;
+  }
+
+  greet() {
+    console.log(`Hello ${this.name}`);
+  }
+
+}
+
+const person = new Person('Gaurav');
+
+person.greet();
+9. Inheritance
+
+Use extends and super.
+
+class Employee extends Person {
+
+  constructor(name, company) {
+
+    super(name);
+
+    this.company = company;
+  }
+
+}
+10. Promises
+
+Used for asynchronous operations.
+
+const promise = new Promise((resolve, reject) => {
+
+  setTimeout(() => {
+
+    resolve('Data received');
+
+  }, 1000);
+
+});
+
+promise
+  .then(data => console.log(data))
+  .catch(error => console.log(error));
+11. Modules
+
+Use export and import.
+
+Export
+export const name = 'Gaurav';
+
+export function greet() {
+  console.log('Hello');
+}
+Import
+import { name, greet } from './user';
+Default Export
+export default function greet() {
+  console.log('Hello');
+}
+
+Import:
+
+import greet from './user';
+12. Enhanced Object Literals
+Old Way
+const name = 'Gaurav';
+
+const user = {
+  name: name
+};
+ES6
+const name = 'Gaurav';
+
+const user = {
+  name
+};
+
+Also supports shorter method syntax:
+
+const user = {
+
+  greet() {
+    console.log('Hello');
+  }
+
+};
+13. Computed Property Names
+
+Create object properties dynamically.
+
+const key = 'name';
+
+const user = {
+  [key]: 'Gaurav'
+};
+
+console.log(user.name);
+14. for...of
+
+Used to iterate over iterable objects like arrays.
+
+const numbers = [1, 2, 3];
+
+for (const number of numbers) {
+
+  console.log(number);
+
+}
+15. Map
+
+Stores key-value pairs.
+
+const userMap = new Map();
+
+userMap.set('name', 'Gaurav');
+userMap.set('age', 25);
+
+console.log(userMap.get('name'));
+16. Set
+
+1
+
+const numbers = new Set([1, 2, 2, 3]);
+
+console.log(numbers);
+
+Output:
+
+Set(3) {1, 2, 3}
+Most Important ES6 Features for Interviews 🚀
+
+Focus on these:
+
+let and const
+Arrow functions
+Template literals
+Destructuring
+Spread and Rest operators
+Promises
+Classes and Inheritance
+Modules (import/export)
+Default parameters
+Map and Set
+for...of
+Interview-Ready Answer
+
+ES6, also known as ECMAScript 2015, introduced modern JavaScript features such as let and const, arrow functions, template literals, destructuring, spread and rest operators, classes, promises, modules, default parameters, Map, and Set. These features make JavaScript code more concise, readable, and maintainable.

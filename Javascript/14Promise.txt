@@ -1,0 +1,819 @@
+================================================================================
+TOPIC 1: PROMISES - PART 1
+(Intro, States, Creation, .then/.catch, API, Promise Chaining)
+================================================================================
+
+TOPICS COVERED
+---------------
+1. Promises
+2. Promise's States
+3. Promise API Application
+
+
+DEFINITION & EXPLANATION
+--------------------------
+Promise in JavaScript Language is the same as the word promise in English
+Language. How do we define a promise in the English language? Some future
+verbal assurance from person A to person B after the completion of something
+(event, time, etc).
+
+Real-life Analogy:
+Peter wants to borrow some money from Bruce. Bruce says:
+"I cannot give it right now. But, On the first of the next month, my salary
+will be credited and I PROMISE to help you. Till then, please be patient."
+
+For two days, the promise Bruce made is in PENDING STATE. On the first of the
+next month:
+1. Salary is credited -> Bruce helps Peter -> Promise FULFILLED (RESOLVED)
+2. Salary not credited OR Bruce has unexpected urgent expense -> Promise REJECTED
+
+From JavaScript's eyes:
+"JavaScript Promise is an object that will be filled with some data in the
+future after some asynchronous operation."
+
+Peter's bank account = the object that will be filled with data (money) once
+the async operation (salary getting credited) is completed.
+
+
+STATES OF A PROMISE
+--------------------
+A Promise would DEFINITELY be in one of the 3 states at a given time:
+
+1. PENDING STATE:
+   When the promise is waiting to be resolved or rejected. Some operation is
+   still being performed. The value of the promise in pending state is UNDEFINED.
+
+2. FULFILLED STATE:
+   The state where the promise has been successfully completed. The required
+   data has been received and the promise has come to a state called RESOLVED.
+   (In the analogy: Bruce got his salary and helped Peter.)
+
+3. REJECTED STATE:
+   The state where the promise has FAILED. The required data has NOT been
+   received or some unexpected error occurred. The promise is REJECTED.
+   (In the analogy: Bruce's salary postponed, he cannot help Peter.)
+
+
+SYNTAX OF PROMISE
+------------------
+let promise = new Promise(function(resolve, reject) {
+
+  // if promise is resolved. resolve function will be called.
+  resolve()
+
+  // if promise is failed or rejected. reject function will be called.
+  reject()
+
+})
+
+Step-by-step breakdown:
+1. Created with 'new Promise' constructor which creates the instance of the
+   promise object which accepts a callback function.
+2. The callback function accepts two callback functions called RESOLVE and
+   REJECT. We do NOT pass them. JS does.
+3. If the promise is resolved/fulfilled -> resolve() will be called. resolve()
+   can accept an argument with the received data.
+4. If the promise is rejected -> reject() will be called. reject() can also
+   accept an argument relevant to the error.
+5. The constructor returns a promise which can be handled depending on state.
+
+
+EXAMPLES
+---------
+
+- PENDING STATE - never calling resolve or reject
+let promise = new Promise(function (resolve, reject) { });
+console.log(promise)
+// Output: Promise { <pending> }
+// The value of the promise in pending state is undefined.
+
+
+- FULFILLED STATE
+let promise = new Promise(function (resolve, reject) {
+  resolve(1);
+});
+console.log(promise);
+// Output: Promise { 1 }
+// State: fulfilled. Value: 1 (value passed to resolve)
+
+
+- REJECTED STATE
+let promise = new Promise(function (resolve, reject) {
+  reject('error');
+});
+console.log(promise);
+// Output: Promise { <rejected> 'error' }
+// The Uncaught error message is because we are NOT handling the error graciously.
+
+
+// IMPLEMENTATION WITH A CONDITION
+function sum(a, b) { return a + b; }
+let addition = sum(3, 4); // 7
+
+let promise = new Promise(function (resolve, reject) {
+  if (addition > 5) {
+    resolve(addition);   // 7 > 5, so resolve is called with value 7
+  }
+  if (addition < 5) {
+    reject(addition);
+  }
+});
+
+console.log(promise)
+// Output: Promise { 7 } -- state: fulfilled, value: 7
+
+
+* HANDLING PROMISE WITH .then AND .catch
+----------------------------------------
+Every promise results in either fulfilled or rejected. Based on that we handle:
+- .then() is called to handle received data if the RESOLVED state is called.
+- .catch() is called to handle error if REJECT is called.
+
+function sum(a, b) { return a + b; }
+let addition = sum(3, 4);
+
+let promise = new Promise(function (resolve, reject) {
+  if (addition > 5) {
+    resolve(addition);
+  }
+  if (addition < 5) {
+    reject('Sum is not what is expected');
+  }
+});
+
+promise
+  .then((data) => {
+    console.log(data);   // logs 7 (the resolved value)
+  })
+  .catch((error) => {
+    console.log(error);  // logs 'Sum is not what is expected'
+  });
+
+// Change sum(3,4) to sum(1,2) -> addition = 3 -> reject called -> catch runs
+// Output from catch: Sum is not what is expected
+
+
+API IMPLEMENTATION WITH FETCH
+-------------------------------
+const promiseOne = fetch('https://api.github.com/users');
+
+const promiseTwo = promiseOne.then((data) => {
+    return data.json();  // MUST return to receive in next .then
+})
+
+promiseTwo.then((response) => {
+    console.log(response);  // array of 30 user objects
+})
+
+// Explanation:
+// 1. fetch() when called with a URL returns a PROMISE.
+// 2. To handle a promise and get the response, we call .then().
+// 3. Calling .then() returns another promise (data.json() also returns a promise).
+// 4. We MUST return data.json() to receive it in the next .then.
+// 5. Calling .catch at end handles invalid URL (404 error logged as object).
+
+
+PROMISE CHAINING
+-----------------
+All the fetch snippets can be rewritten as a CHAIN:
+
+const promiseOne = fetch("https://api.github.com/users");
+
+promiseOne
+  .then((data) => {
+    return data.json();
+  })
+  .then((response) => {
+    console.log(response);
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+
+// PROMISE CHAIN structure:
+promise
+  .then()
+  .then()
+  .then()
+  .then()
+  ...
+  .catch()  // Always at the end
+
+Remember the callback hell from the callbacks story? Code was growing
+HORIZONTALLY. A pyramid of doom was forming. Well, Promise chaining is the
+solution. The code is growing VERTICALLY. Easy to maintain and understand.
+
+The more important point: Promises are designed so that whenever data is
+received, the promise WILL DEFINITELY be called. That is NOT the case with
+callbacks in callback hell — they are NOT trustworthy. All the error scenarios
+do NOT deal well with callbacks. So, it is NOT recommended to use nested
+callbacks for asynchronous operations. Your answer is PROMISES.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is a Promise in JavaScript?
+A1. A Promise is an object that will be filled with some data in the future
+    after some asynchronous operation. Just like a real-life promise, it will
+    either be fulfilled (resolved) or rejected.
+
+Q2. What are the 3 states of a Promise?
+A2. 1) Pending - waiting, value is undefined.
+    2) Fulfilled - successfully completed, resolve() was called.
+    3) Rejected - failed, reject() was called.
+
+Q3. What is the value of a promise in the pending state?
+A3. undefined.
+
+Q4. How do you handle a resolved vs rejected promise?
+A4. .then() handles the resolved state. .catch() handles the rejected state.
+
+Q5. Why is it a MUST to return inside a .then block in promise chaining?
+A5. Returning a value from .then() allows the next .then() in the chain to
+    receive that value. Without return, the next .then() receives undefined.
+
+Q6. What is Promise Chaining and why is it better than callback hell?
+A6. Promise chaining is calling .then().then().then() back to back. Code grows
+    vertically (easy to read). Callback hell grows horizontally (pyramid of
+    doom). Promises are also more reliable and trustworthy.
+
+
+================================================================================
+TOPIC 2: PROMISES - PART 2
+(Promise.all, Promise.allSettled, Promise.race, Promise.any, Promise.finally)
+================================================================================
+
+TOPICS COVERED
+---------------
+1. Promise.all()
+2. Promise.allSettled()
+3. Promise.race()
+4. Promise.any()
+5. Promise.finally()
+
+
+1. PROMISE.ALL()
+-----------------
+The Promise.all() method accepts an iterable (such as an array) of promises and returns a promise whose value is an ARRAY OF THE VALUES of the promises passed to it. The output array will be in the ORDER of promises passed,regardless of completion order.
+
+KEY BEHAVIORS:
+- If ALL promises resolve -> returns array of all resolved values.
+- If ONE promise rejects -> the returned promise is REJECTED with the message of that first rejected promise. Does NOT wait for others.
+- If MORE THAN ONE rejects -> error message is of the FIRST rejected promise.
+- If one promise takes more time -> Promise.all() WAITS until all are complete.
+- If an EMPTY ARRAY is passed -> returns an empty array.
+
+
+// All Resolved
+let promiseOne = Promise.resolve("Hello World");
+let promiseTwo = Promise.resolve("123");
+let promiseThree = new Promise((resolve, reject) => { resolve("Good Morning"); });
+
+let promise = Promise.all([promiseOne, promiseTwo, promiseThree]);
+promise
+  .then((data) => { console.log(data); })
+  .catch((error) => { console.log(error); });
+// Output: ['Hello World', '123', 'Good Morning']
+
+
+// If One Promise Fails
+let promiseOne = Promise.reject("promise did not pass");
+let promiseTwo = Promise.resolve("Hello World");
+let promiseThree = new Promise((resolve, reject) => { resolve("Good Morning"); });
+
+let promise = Promise.all([promiseOne, promiseTwo, promiseThree]);
+promise
+  .then((data) => { console.log(data); })
+  .catch((error) => { console.log(error); });
+// Output: "promise did not pass" (catch block runs, NOT then)
+* Now, if one of the promises in the array is failed, then the final promise is also rejected with the message passed in the failed promise.
+
+
+// If More than one Promise Fails
+let promiseOne = Promise.reject("Hello World");
+let promiseTwo = Promise.reject("promise did not pass");
+// Output: "Hello World" (FIRST rejection's message wins)
+
+
+// With setTimeout - waits for all
+let promiseThree = new Promise((resolve, reject) => {
+  setTimeout(
+    (val) => { resolve(val); },
+    3000,
+    "Took 3 seconds"
+  );
+});
+let promise = Promise.all([promiseOne, promiseTwo, promiseThree]);
+// Output (after 3 seconds): ['Hello World', 'Have a great day', 'Took 3 seconds']
+
+
+2. PROMISE.ALLSETTLED()
+------------------------
+- In most of the sense, Promise.all and Promise.allSettled are the same. Both take an iterable of promises and return a promise. The DIFFERENCE lies in the output.
+
+Promise.all() returns a promise whose value is an array of the VALUES of the promises.
+
+- Promise.allSettled() returns an array of the OUTCOMES of the promises. The output array will be in the order of the promises passed, regardless of completion order. Promise.allSettled also waits for all promises to settle.
+
+
+// All Resolved
+let promise = Promise.allSettled([promiseOne, promiseTwo, promiseThree]);
+promise
+  .then((data) => { console.log(data); })
+  .catch((error) => { console.log(error); });
+// Output:
+// [
+//   { status: 'fulfilled', value: 'Hello World' },
+//   { status: 'fulfilled', value: '123' },
+//   { status: 'fulfilled', value: 'Good Morning' }
+// ]
+
+
+// If One Promise Fails - STILL gives all outcomes
+let promiseTwo = Promise.reject("I am failed");
+let promise = Promise.allSettled([promiseOne, promiseTwo, promiseThree]);
+// Output:
+// [
+//   { status: 'fulfilled', value: 'Hello World' },
+//   { status: 'rejected', reason: 'I am failed' },
+//   { status: 'fulfilled', value: 'Good Morning' }
+// ]
+// The rejected one will have status "rejected", rest as normal.
+
+
+// If More than one Promise Fails
+// Even if more than one promise fails, the output will be the outcomes of ALL
+// the promises logged in the array. Unlike promise.all() which rejects early.
+
+
+OUTPUT of Promise.allSettled() is an array of objects with:
+1. status: 'fulfilled' or 'rejected'
+2. value: The value of the promise which is fulfilled.
+3. reason: The reason the promise was rejected with.
+
+Once again:
+- Promise.all() REJECTS IMMEDIATELY the moment one of the promises is rejected.
+- Promise.allSettled() WAITS until all promises are completed whether rejected or fulfilled.
+
+
+3. PROMISE.RACE()
+------------------
+The Promise.race() also takes an array of promises as input and returns a promise. The returned promise is completed as soon as ONE of the promises in
+the array is SETTLED (resolved or rejected). It is like a race between the
+promises. Whenever one of them settles and WINS, the returned promise is also
+settled with the SAME STATE as that of the first settled promise.
+
+
+// Both promises are resolved - faster one wins
+let promiseOne = new Promise((resolve, reject) => {
+  setTimeout(resolve, 3000, "Slower Promise");
+});
+let promiseTwo = new Promise((resolve, reject) => {
+  setTimeout(resolve, 1000, "Faster promise");
+});
+let promise = Promise.race([promiseOne, promiseTwo]);
+promise.then((val) => { console.log(val); });
+// Output: "Faster promise" (after 1 second)
+// Both the promises are resolved, but the value of the FASTER one is logged.
+
+
+// Faster resolves, Slower rejects
+let promiseOne = new Promise((resolve, reject) => {
+  setTimeout(reject, 3000, "Slower Promise is rejected");
+});
+let promiseTwo = new Promise((resolve, reject) => {
+  setTimeout(resolve, 1000, "Faster promise is resolved");
+});
+// Output: "Faster promise is resolved" -> .then runs (faster was resolved)
+
+
+// Faster REJECTS, Slower resolves
+let promiseOne = new Promise((resolve, reject) => {
+  setTimeout(resolve, 3000, "Slower Promise is resolved");
+});
+let promiseTwo = new Promise((resolve, reject) => {
+  setTimeout(reject, 1000, "Faster promise is rejected");
+});
+// Output: "Faster promise is rejected" -> .catch runs (faster was rejected)
+
+
+// Both Reject - faster rejection wins
+let promiseOne = new Promise((resolve, reject) => {
+  setTimeout(reject, 3000, "Slower Promise is rejected");
+});
+let promiseTwo = new Promise((resolve, reject) => {
+  setTimeout(reject, 1000, "Faster promise is rejected");
+});
+// Output: "Faster promise is rejected" -> .catch runs
+
+
+NOTE: Passing an empty array in Promise.race() will return a promise that will
+      be PENDING FOREVER.
+
+
+4. PROMISE.ANY()
+-----------------
+The Promise.any() method accepts an iterable (array) of promises and returns
+a promise that will be FULFILLED when ANY one of the promises in the iterable
+is fulfilled. Even if some of the promises are rejected, Promise.any() still
+can return a fulfilled promise. It only needs ONE promise in a FULFILLED state.
+The value of the returned promise will be the value of the FIRST fulfilled
+promise.
+
+If ALL promises are rejected -> an Error Message is logged: All promises were
+rejected (AggregateError).
+
+NOTE: Passing an empty array in Promise.any() will also throw the same
+AggregateError: All promises were rejected.
+
+
+// All Resolved -> first resolved value wins
+let promiseOne = Promise.resolve("1");
+let promiseTwo = Promise.resolve("2");
+let promiseThree = Promise.resolve("3");
+// Output: 1
+
+
+// One Rejected, two resolved -> first resolved value
+let promiseOne = Promise.reject("1");
+let promiseTwo = Promise.resolve("2");
+let promiseThree = Promise.resolve("3");
+// Output: 2
+
+
+// Two Rejected, one resolved -> that resolved value
+let promiseOne = Promise.reject("1");
+let promiseTwo = Promise.reject("2");
+let promiseThree = Promise.resolve("3");
+// Output: 3
+
+
+// All Rejected -> AggregateError
+let promiseOne = Promise.reject("1");
+let promiseTwo = Promise.reject("2");
+let promiseThree = Promise.reject("3");
+let promise = Promise.any([promiseOne, promiseTwo, promiseThree]);
+promise
+  .then((val) => { console.log(val); })
+  .catch((error) => { console.log(error); });
+// Output: [AggregateError: All promises were rejected]
+
+
+5. PROMISE.FINALLY()
+---------------------
+Just like there is a finally in try-catch blocks, Promises also have a finally
+function. The finally method will eventually be called whenever the promise has
+settled i.e. Either FULFILLED or REJECTED. It does not matter what the state
+of the promise is. finally will ALWAYS execute.
+
+The purpose of finally is to perform CLEAN-UP OPERATIONS after the promise
+is settled. The finally function is called with NO ARGUMENTS and we generally
+have no idea about the state of the promise inside it. The returned value of
+the finally function is usually IGNORED.
+
+If the parent promise is rejected, the promise returned by finally will also
+be rejected. On the other hand, the state of the promise is NOT bothered by
+finally — it just always runs.
+
+
+// Resolved promise - finally still runs
+new Promise((resolve, reject) => { resolve("Resolved"); })
+  .then((val) => { console.log(val); })
+  .catch((err) => { console.error(err); })
+  .finally(() => { console.log("Finally Block Executed"); });
+// Output: "Resolved" -> "Finally Block Executed"
+
+
+// Rejected promise - finally still runs
+new Promise((resolve, reject) => { reject("Rejected"); })
+  .then((val) => { console.log(val); })
+  .catch((err) => { console.error(err); })
+  .finally(() => { console.log("Finally Block Executed"); });
+// Output: "Rejected" (catch) -> "Finally Block Executed"
+
+
+PROMISE METHODS CHEAT SHEET
+-----------------------------
+Method               | Waits for all? | If one fails?              | Returns
+---------------------|----------------|----------------------------|----------------------------
+Promise.all()        | YES            | Rejects immediately        | Array of values (in order)
+Promise.allSettled() | YES            | Waits, shows all outcomes  | Array of {status,value/reason}
+Promise.race()       | NO (1st wins)  | Rejects if fastest fails   | First settled (any state)
+Promise.any()        | NO (1st wins)  | Continues (needs 1 pass)   | First FULFILLED value
+Promise.finally()    | N/A            | Still executes always      | N/A (cleanup only)
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the difference between Promise.all() and Promise.allSettled()?
+A1. Promise.all() rejects immediately if any one promise fails and gives array
+    of values for all. Promise.allSettled() waits for all to finish regardless
+    of rejections and gives array of outcome objects (status + value/reason).
+
+Q2. What is Promise.race()?
+A2. Returns a promise settled with the state and value of the FIRST settled
+    promise - whichever resolves or rejects first in the race.
+
+Q3. What is the difference between Promise.race() and Promise.any()?
+A3. Promise.race() settles with the FIRST settled promise (win or lose).
+    Promise.any() settles with the FIRST FULFILLED promise. It ignores all
+    rejections unless ALL are rejected.
+
+Q4. What happens if you pass an empty array to Promise.all()?
+A4. Returns a resolved promise with an empty array.
+
+Q5. What happens if you pass an empty array to Promise.race()?
+A5. Returns a promise that will be PENDING FOREVER.
+
+Q6. What happens if you pass an empty array to Promise.any()?
+A6. Returns a rejected promise with AggregateError: All promises were rejected.
+
+Q7. What is the use of Promise.finally()?
+A7. To perform cleanup operations after a promise settles, regardless of
+    whether it resolved or rejected. It takes no arguments.
+
+Q8. What does Promise.allSettled() return for each promise in its output array?
+A8. An object with:
+    { status: 'fulfilled', value: ... } for resolved promises
+    { status: 'rejected', reason: ... } for rejected promises
+
+
+================================================================================
+TOPIC 3: PROMISES - PART 3
+(Interview Q&A Problems)
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+Two GOLDEN RULES to remember before solving every problem:
+1. In JavaScript, SYNCHRONOUS CODE executes BEFORE asynchronous code.
+2. Synchronous code executes in ORDER from top to bottom.
+
+Also remember:
+- The CREATION of a promise and execution of its callback is SYNCHRONOUS.
+- resolve() and reject() themselves execute ASYNCHRONOUSLY.
+- Once resolve OR reject is called, the SECOND one is IGNORED completely.
+- The NAME of resolve/reject params does NOT matter — the ORDER matters.
+  First param = resolve (fulfilled), Second param = reject. Always.
+- We MUST call .then or .catch to use the returned promise after resolve/reject.
+
+
+PROBLEMS WITH OUTPUTS AND EXPLANATIONS
+----------------------------------------
+
+// PROBLEM 1: Promise creation is SYNCHRONOUS
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  console.log("inside promise");
+});
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye
+REASON: The creation of a promise and execution of its callback is SYNCHRONOUS.
+        "inside promise" runs in the middle just like any synchronous code.
+
+
+// PROBLEM 2: resolve() is ASYNC, but promise creation is SYNC
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  resolve('Promise Resolved')
+  console.log("inside promise");
+});
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye
+REASON: resolve() runs asynchronously, but we are not calling .then so nothing
+        extra is logged. "inside promise" still runs synchronously inside the
+        promise callback.
+
+
+// PROBLEM 3: resolve() + .then
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  resolve('Promise Resolved')
+  console.log("inside promise");
+});
+promise.then((value) => { console.log(value) })
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye -> Promise Resolved
+REASON: Synchronous code runs first (Hello, inside promise, GoodBye).
+        Once synchronous code is done, async .then runs: "Promise Resolved".
+
+
+// PROBLEM 4: reject() + only .then (no .catch)
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  reject('Promise Rejected')
+  console.log("inside promise");
+});
+promise.then((value) => { console.log(value) })
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye -> Uncaught (in promise) Promise Rejected
+REASON: reject() called but we only have .then, not .catch. Since reject was
+        called, .then is skipped and error is uncaught.
+
+
+// PROBLEM 5: Both resolve AND reject called - only FIRST one matters
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  resolve("Promise Resolved");
+  console.log("inside promise");
+  reject("Promise Rejected")
+});
+promise
+  .then((value) => { console.log(value); })
+  .catch((error) => { console.log(error); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye -> Promise Resolved
+REASON: resolve() is called first. Once resolve OR reject is called, the
+        SECOND call is completely IGNORED. So reject and .catch never trigger.
+
+
+// PROBLEM 6: TRICKY - Only ONE param passed (ORDER matters, NOT name)
+console.log("Hello");
+let promise = new Promise((reject) => {   // only ONE param named "reject"!
+  console.log("inside promise");
+  reject("Promise is finished");
+});
+promise
+  .then((value) => { console.log("Inside then block", value); })
+  .catch((error) => { console.log("Inside catch block", error); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> inside promise -> GoodBye -> Inside THEN block Promise is finished
+REASON: The promise callback always accepts 2 params. The FIRST is ALWAYS
+        resolve and the SECOND is ALWAYS reject regardless of their names.
+        Here, only one param is passed. It will ALWAYS settle promise into
+        FULFILLED state regardless of its name being "reject".
+        So .then runs, NOT .catch.
+
+
+// PROBLEM 7: resolve called twice - second is IGNORED
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  resolve("Promise Resolved");
+  resolve("Resolved Called Again");  // IGNORED
+});
+promise
+  .then((value) => { console.log(value); })
+  .catch((error) => { console.log(error); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> GoodBye -> Promise Resolved
+REASON: Second resolve is ignored. Only first one counts.
+        Also notice "inside promise" is not here because there's no console
+        inside the promise callback this time.
+
+
+// PROBLEM 8: (reject, resolve) - REVERSED param names
+console.log("Hello");
+let promise = new Promise((reject, resolve) => {
+  reject("Promise is finished");  // 'reject' here is ACTUALLY resolve (1st param)
+});
+promise
+  .then((value) => { console.log("inside then block", value); })
+  .catch((error) => { console.log("inside catch block", error); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> GoodBye -> Inside THEN block Promise is finished
+REASON: Same logic as Problem 6. Even though the first param is NAMED "reject",
+        it is the FIRST PARAM so it ALWAYS settles the promise as FULFILLED.
+        Code goes to .then, NOT .catch.
+
+
+// PROBLEM 9: Second param named "resolve" -> actually REJECTS
+let promise = new Promise((reject, resolve) => {
+  console.log('Before Resolved')
+  resolve("Promise Resolved");  // 'resolve' here = second param = actually REJECT
+  console.log('After Resolved')
+});
+promise
+  .then((value) => { console.log("inside then block", value); })
+  .catch((error) => { console.log("inside catch block", error); });
+
+OUTPUT: Before Resolved -> After Resolved -> Inside CATCH block Promise Resolved
+REASON: The second param named "resolve" is actually the REJECT function
+        (because ORDER matters, not name). So calling it sends code to .catch.
+
+
+// PROBLEM 10: setTimeout inside promise - Promise has HIGHER PRIORITY
+console.log("Hello");
+let promise = new Promise((resolve, reject) => {
+  console.log('Before Resolved')
+  setTimeout(() => { console.log(1); }, 1000);
+  resolve("Promise Resolved");
+  console.log('After Resolved')
+});
+promise
+  .then((value) => { console.log("inside then block", value); })
+  .catch((error) => { console.log("inside catch block", error); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> Before Resolved -> After Resolved -> GoodBye
+        -> Inside then block Promise Resolved -> 1 (after 1 second)
+REASON: Promises have HIGHER PRIORITY over setTimeout in execution order.
+        Promises go to the Microtask Queue (higher priority).
+        setTimeout goes to the Callback Queue (lower priority).
+        So .then runs before setTimeout's callback.
+
+
+// PROBLEM 11: .then AFTER .catch runs if catch RETURNS a value
+console.log("Hello");
+let promise = new Promise((resolve, reject) => { reject("Promise Rejected"); });
+promise
+  .then((value) => { console.log("inside First then block", value); })
+  .then((response) => { console.log("Inside Second Then", response); })
+  .catch((error) => {
+    console.log("inside catch block", error);
+    return "Error Received";  // returning from catch RESOLVES a new promise
+  })
+  .then((response) => { console.log("Inside Third Then:", response); });
+console.log("GoodBye");
+
+OUTPUT: Hello -> GoodBye -> inside catch block Promise Rejected
+        -> Inside Third Then: Error Received
+REASON: Promise rejected -> skips both .then blocks -> goes to .catch.
+        Returning a value from .catch RESOLVES a new promise, so the NEXT
+        .then after .catch runs with the returned value ("Error Received").
+
+
+// PROBLEM 12: throw inside .then -> goes to .catch (behaves like reject)
+let promise = new Promise((resolve, reject) => { resolve("Promise Resolved"); });
+promise
+  .then((value) => {
+    console.log("inside First then block", value);
+    throw 'new Error'    // throw inside .then behaves like calling reject
+  })
+  .then((response) => { console.log("Inside Second Then", response); })
+  .catch((error) => {
+    console.log("inside catch block", error);
+    return "Error Received";
+  })
+  .then((response) => { console.log("Inside Third Then", response); });
+
+OUTPUT: GoodBye -> inside First then block Promise Resolved
+        -> Inside catch block: new Error -> Inside Third Then, Error Received
+REASON: throw inside .then acts like reject(). Skips next .then, goes to
+        .catch. Returning from .catch resolves next .then.
+
+
+// PROBLEM 13: throw in LAST .then with NO .catch after it -> Uncaught error
+let promise = new Promise((resolve, reject) => { resolve("Promise Resolved"); });
+promise
+  .then((value) => {
+    console.log("inside First then block", value);
+    return 'new Error'   // return (not throw) -> goes to next .then
+  })
+  .then((response) => {
+    console.log("Inside Second Then", response);
+    return response
+  })
+  .catch((error) => {
+    console.log("inside catch block", error);
+    return "Error Received";
+  })
+  .then((response) => {
+    console.log("Inside Third Then", response);
+    throw 'Failed at the End'   // throw here, NO .catch after this!
+  });
+
+OUTPUT: GoodBye -> inside First then block Promise Resolved
+        -> Inside Second Then new Error -> Inside Third Then new Error
+        -> Uncaught (in promise) Failed at the End
+REASON: throw in last .then with no .catch after it -> Uncaught promise error.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. Is the creation of a Promise synchronous or asynchronous?
+A1. The CREATION of a promise and execution of its callback is SYNCHRONOUS.
+    Only the resolve() and reject() themselves are asynchronous.
+
+Q2. What is the order of execution - sync vs async code?
+A2. Synchronous code ALWAYS executes BEFORE asynchronous code.
+
+Q3. What happens if both resolve() and reject() are called?
+A3. Only the FIRST one is honored. The second call is completely IGNORED.
+
+Q4. Does the name of resolve/reject params matter in a promise constructor?
+A4. NO. Only the ORDER matters. First param = always resolve (fulfilled).
+    Second param = always reject. The name can be anything.
+
+Q5. What is the priority order: setTimeout vs Promise .then?
+A5. Promises have HIGHER PRIORITY than setTimeout. Promises use the
+    Microtask Queue while setTimeout uses the Callback/Macrotask Queue.
+    Microtasks always execute before macrotasks.
+
+Q6. What happens when you return a value from .catch()?
+A6. It resolves a NEW promise, and the NEXT .then() after the .catch will
+    execute with that returned value.
+
+Q7. What happens if you throw inside a .then()?
+A7. It rejects the promise returned by that .then(), and the next .catch()
+    in the chain executes.
+
+Q8. What happens if you throw in the last .then and there is no .catch after it?
+A8. You get an Uncaught (in promise) error in the console.

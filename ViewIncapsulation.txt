@@ -1,0 +1,117 @@
+View encapsulation in Angular refers to how the styles (CSS) applied to a component are isolated and scoped to that component. 
+- It controls whether the styles of one component affect other components or if they are kept separate. Angular offers three types of view encapsulation:
+
+1. Emulated (default):
+
+Angular's default encapsulation method.
+The styles you define in a component are scoped to that component only (as if they were inside a shadow DOM), but Angular simulates this using standard HTML and CSS.
+
+How it works: Angular adds unique attributes to the HTML elements and styles to make sure styles don't "leak" out of the component or affect other components.
+
+Use case: Safeguards component styles from influencing the whole app without needing to use actual shadow DOM.
+
+
+2. None:
+
+No encapsulation is applied.
+The styles you define in a component are global, meaning they apply to all components in the application.
+
+How it works: The styles are applied globally without any scoping.
+
+Use case: If you want the styles of one component to affect other components, you might use this option, but it can lead to CSS conflicts.
+
+
+3. Shadow DOM:
+
+Angular uses the browser's native shadow DOM encapsulation.
+- The styles and DOM are fully encapsulated within the component, meaning styles defined in a component won't affect other components or the global scope, and vice versa.
+
+How it works: The browser provides the shadow DOM feature, and Angular takes advantage of it.
+
+Use case: For true, strict encapsulation, if your browser supports shadow DOM.
+
+In Simple Terms:
+Emulated (default): Styles stay in the component but aren't truly isolated (Angular "pretends" they're isolated).
+
+None: Styles are global and can affect other components.
+
+Shadow DOM: Styles are fully isolated, using the browser’s native shadow DOM technology.
+Most of the time, you will stick with emulated encapsulation, as it's both effective and compatible across all browsers.
+
+--------------------------------------------------------------------------------------------
+
+Here’s a simple example of view encapsulation in Angular using a basic component with three different encapsulation types.
+
+Setup:
+You’ll create an Angular component (app-example) and define some styles in the component. Then, you can see how these styles behave under different view encapsulation modes.
+
+1. Emulated (Default):
+In this mode, the styles are scoped to the component and won’t affect other components. Angular emulates encapsulation by adding unique attributes to HTML elements and styles.
+
+typescript
+Copy code
+// app-example.component.ts
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `<h1 class="title">Emulated Encapsulation</h1>`,
+  styles: [`
+    .title {
+      color: red;
+    }
+  `],
+  encapsulation: ViewEncapsulation.Emulated  // Default, you can omit this line
+})
+export class ExampleComponent {}
+The <h1> tag inside this component will be red.
+This red style will not affect other components in the app.
+This is the default behavior, and you don’t need to explicitly set the encapsulation property.
+
+
+2. None (Global Styles):
+
+In this mode, styles defined in a component apply globally, so any elements with the same class name in other components will also be affected.
+
+typescript
+Copy code
+import { Component, ViewEncapsulation } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `<h1 class="title">No Encapsulation</h1>`,
+  styles: [`
+    .title {
+      color: green;
+    }
+  `],
+  encapsulation: ViewEncapsulation.None
+})
+export class ExampleComponent {}
+
+The <h1> tag in this component will be green.
+The green style will affect any other element in the entire app that has the class .title.
+
+
+3. Shadow DOM:
+
+In this mode, styles are encapsulated using the browser's native Shadow DOM feature. The styles are scoped only to the component, and no styles will leak in or out.
+
+typescript
+Copy code
+import { Component, ViewEncapsulation } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `<h1 class="title">Shadow DOM Encapsulation</h1>`,
+  styles: [`
+    .title {
+      color: blue;
+    }
+  `],
+  encapsulation: ViewEncapsulation.ShadowDom
+})
+export class ExampleComponent {}
+
+The <h1> tag in this component will be blue.
+The blue style won’t affect other components, and no outside styles will affect this component, thanks to the browser's native Shadow DOM.

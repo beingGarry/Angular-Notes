@@ -1,0 +1,143 @@
+The CSS position property controls how an element is placed on a webpage.
+
+There are 5 main position values:
+
+1. static (Default)
+
+Every HTML element has position: static by default.
+
+Elements appear in their normal order.
+top, right, bottom, and left do not work.
+.box {
+  position: static;
+}
+
+Example:
+
+[ Header ]
+[ Content ]
+[ Footer ]
+
+
+2. relative
+
+The element stays in its original position, but you can move it relative to where it originally was.
+
+.box {
+  position: relative;
+  top: 20px;
+  left: 30px;
+}
+
+👉 The element moves 20px down and 30px right, but its original space is still reserved.
+
+Original position:
+[ BOX ]
+
+After relative positioning:
+      [ BOX ]  ← moved
+Important use:
+
+- position: relative is commonly used as a parent container for an absolutely positioned child.
+
+3. absolute
+
+The element is removed from the normal document flow.
+
+It positions itself relative to the nearest positioned parent (a parent with relative, absolute, fixed, or sticky position).
+
+.parent {
+  position: relative;
+}
+
+.child {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+Example:
+
+Parent
++-------------------+
+|              BOX  | ← absolute
+|                   |
++-------------------+
+
+👉 Very commonly used for:
+
+Notification badges
+Icons
+Popups
+Overlays
+
+
+4. fixed
+
+The element is positioned relative to the browser viewport.
+
+It stays in the same place even when you scroll.
+
+.box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+Example:
+
+Screen
++-----------------------+
+|                       |
+|       Content         |
+|                       |
+|                 BOX   | ← always stays here
++-----------------------+
+
+👉 Common uses:
+
+Chat buttons
+Fixed navigation bars
+Back-to-top buttons
+5. sticky
+
+sticky is a combination of relative and fixed.
+
+Initially behaves like relative.
+When scrolling reaches a specified position, it behaves like fixed.
+.box {
+  position: sticky;
+  top: 0;
+}
+
+👉 Common use:
+
+Before scrolling:
+[ Header ]
+[ Content ]
+
+While scrolling:
+[ Header stays at top ] ← sticky
+[ Content scrolling ]
+
+Commonly used for:
+
+Sticky  headers
+Navigation bars
+Table headers
+Quick Comparison
+
+- Position	                                 Removed from Normal Flow?	                    Positioned Relative To
+static	                                             ❌ No	                               Normal document flow
+relative                                             ❌ No	                                Its original position
+absolute	                                         ✅ Yes	                              Nearest positioned parent
+fixed                                                ✅ Yes	                                 Browser viewport
+sticky	                                             ❌ Usually	                          Scroll container / viewport
+
+* Easy way to remember 🎯
+
+Static → Normal position
+Relative → Move from original position
+Absolute → Place exactly inside a parent
+Fixed → Fixed on the screen
+Sticky → Normal first, then sticks while scrolling

@@ -1,0 +1,222 @@
+* In Angular, routing is a mechanism that allows navigation between different views or components in your application based on the URL. It maps a URL path to a specific component, enabling the user to navigate the application seamlessly without reloading the page.
+
+Key Concepts of Angular Routing:
+
+- Router Module:
+
+To use routing in Angular, you need to import the RouterModule from @angular/router and define your routes.
+
+Routes are defined as an array of objects where each object maps a URL path to a component.
+
+- Routes:
+
+A route defines a mapping between a URL path and a component.
+
+Example route definition:
+
+const routes: Routes = [
+  { path: 'home', component: HomeComponent },
+  { path: 'about', component: AboutComponent }
+];
+
+- Router Outlet:
+
+A <router-outlet> is a placeholder in your template where the routed component will be displayed.
+
+<router-outlet></router-outlet>
+
+- Router Link:
+
+The routerLink directive is used to navigate between routes in your application.
+html
+Copy code
+<a routerLink="/home">Home</a>
+<a routerLink="/about">About</a>
+
+- Wildcard Routes:
+
+A wildcard route is used to catch all undefined or invalid routes. It acts as a "catch-all" and is often used to display a "404 Not Found" page.
+
+Wildcard route syntax:
+
+	typescript
+Copy code
+{ path: '**', component: PageNotFoundComponent }
+
+In this case, if the user navigates to a URL that doesn't match any defined routes, the PageNotFoundComponent will be displayed.
+
+- Redirect Routes:
+
+Redirect routes are used to automatically redirect users from one route to another. This is useful if you want to provide default behavior or redirect obsolete paths.
+
+Redirect route syntax:
+
+	typescript
+Copy code
+{ path: '', redirectTo: '/home', pathMatch: 'full' }
+
+- pathMatch: The pathMatch property is used to determine how strictly the route path is matched.
+
+* pathMatch: 'full': This means the entire path must match to trigger the redirect.
+
+* pathMatch: 'prefix': This means that any path that starts with the specified value will match.
+
+Example: If a user navigates to the root path (/), they will be redirected to the /home route.
+
+----------------------------------------------------------------------------------
+
+- Nested (Child) Routes:
+
+You can define nested routes, where a parent route has multiple child routes. This is useful for building multi-step forms or layouts where some components are part of a larger structure.
+
+Example:
+	typescript
+Copy code
+const routes: Routes = [
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent,
+    children: [
+      { path: 'stats', component: StatsComponent },
+      { path: 'reports', component: ReportsComponent }
+    ]
+  }
+];
+In this case, navigating to /dashboard/stats will display the StatsComponent inside the DashboardComponent.
+
+- Route Parameters:
+You can pass dynamic values through the URL using route parameters. This is often used to display specific details for an item (e.g., user/:id).
+
+Example:
+
+	typescript
+Copy code
+const routes: Routes = [
+  { path: 'user/:id', component: UserComponent }
+];
+
+To retrieve the parameter (id) in the component:
+
+	typescript
+Copy code
+
+* import { ActivatedRoute } from '@angular/router';
+
+constructor(private route: ActivatedRoute) {
+ const userId = this.route.snapshot.paramMap.get('id');
+}
+
+- Lazy Loading:
+
+Lazy loading is a technique to load modules only when they are needed (i.e., when the user navigates to a route). This improves the initial load time of the application.
+
+Example of lazy loading a module:
+
+const routes: Routes = [
+  { path: 'admin', loadChildren: () => import('./admin/admin.module').then(m => m.AdminModule) }
+];
+
+In this case, the AdminModule will only be loaded when the user navigates to the /admin route.
+
+- Guarding Routes:
+
+Route guards (like CanActivate, CanDeactivate, etc.) allow you to control access to routes. For example, you can prevent users from navigating to a route if they are not authenticated.
+
+Example of using a CanActivate guard:
+
+	typescript
+Copy code
+const routes: Routes = [
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] }
+];
+In this case, AuthGuard would implement logic to check if the user is authenticated before allowing access to the DashboardComponent.
+
+Full Example with Wildcard, Redirect, and Child Routes:
+	typescript
+Copy code
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { HomeComponent } from './home/home.component';
+import { AboutComponent } from './about/about.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { StatsComponent } from './dashboard/stats/stats.component';
+import { ReportsComponent } from './dashboard/reports/reports.component';
+
+const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' }, // Redirect to home
+  { path: 'home', component: HomeComponent },
+  { path: 'about', component: AboutComponent },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    children: [
+      { path: 'stats', component: StatsComponent },
+      { path: 'reports', component: ReportsComponent }
+    ]
+  },
+  { path: '**', component: PageNotFoundComponent } // Wildcard route
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}
+Summary:
+
+
+Code Explanation:
+	
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+====================================================
+
+- @NgModule:
+
+This is a decorator that marks the class as an Angular module. An Angular module (NgModule) is used to group related components, services, and other modules together.
+
+imports: [RouterModule.forRoot(routes)]:
+
+The imports array specifies the external modules that are needed for this module to work.
+
+* RouterModule.forRoot(routes) is the key part here:
+
+*  RouterModule: 
+
+Angular’s built-in module that provides routing capabilities to navigate between different views or pages in the application.
+
+* forRoot(routes):
+
+This method sets up the router with a set of routes. It registers the root-level configuration for routing.
+
+routes is an array of route definitions that define the paths in the application and the corresponding components to display when the path is matched.
+
+Example of routes array:
+	typescript
+Copy code
+const routes: Routes = [
+  { path: 'home', component: HomeComponent },
+  { path: 'about', component: AboutComponent }
+];
+
+exports: [RouterModule]:
+
+The exports array makes the RouterModule available to other modules that import this module.
+This is necessary to ensure that the components declared in other modules have access to the routing features.
+
+Routing allows navigation between different views/components in an Angular app.
+RouterModule is configured with routes, each mapping a path to a component.
+Wildcard (**) is used to catch all undefined routes and display a "Not Found" page.
+Redirect (redirectTo) is used to automatically navigate from one route to another.
+Nested routes enable hierarchical views.
+Route parameters allow dynamic data to be passed through URLs.
+Lazy loading improves performance by loading modules on demand.
+Guards are used to protect routes based on specific conditions, like authentication.
+
+
+
+
+

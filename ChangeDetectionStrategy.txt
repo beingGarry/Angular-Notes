@@ -1,0 +1,276 @@
+* Change Detection in Angular is the process by which the framework checks the state of the application, detects any changes in the data model (component properties or template variables), and updates the view (DOM) accordingly. 
+
+This mechanism ensures that when the data changes, the view stays in sync without manual DOM manipulation.
+
+* How Angular Change Detection Works:
+
+Angular's change detection is a core part of its architecture. It runs automatically, triggered by various events such as:
+
+User interactions (clicks, typing, etc.)
+HTTP responses or other asynchronous events (like timers)
+Component input (@Input) changes
+
+- When Angular runs change detection, it checks each component in a hierarchical order to determine whether any data-bound properties in the component have changed. If a change is detected, Angular updates the DOM.
+
+* Change Detection Process:
+
+Template Binding: Angular templates are bound to component properties using template syntax ({{}}, *ngIf, *ngFor, etc.). Angular tracks these bindings and checks for changes.
+
+Change Detection Cycle (Digest Cycle): Angular checks all components and directives in a tree structure (component hierarchy), starting from the root component down to the child components, to see if any data has changed.
+
+Updating the DOM: If a change is detected, Angular updates the DOM based on the updated data. This happens automatically without the developer needing to manipulate the DOM directly.
+================================================================
+* When Does Change Detection Run?
+
+Angular's change detection runs automatically under the following conditions:
+
+- User events: Any interaction (clicks, input, etc.) with the application triggers change detection.
+
+- HTTP or async events: When an asynchronous event (like an HTTP request) completes, Angular checks for changes.
+
+- Timers: Functions like setTimeout() or setInterval() trigger change detection when they complete.
+
+- Component lifecycle hooks: Change detection is triggered at different stages of the component lifecycle, like ngOnInit and ngAfterViewChecked.
+
+* Zones in Angular:
+
+Angular uses a library called Zone.js to intercept asynchronous operations (like HTTP requests, user events, and timeouts) and trigger change detection. Zone.js creates a zone (execution context) for the application, and whenever something changes in the application (e.g., user clicks a button, data is fetched), Zone.js ensures that Angular is notified to run change detection.
+============================================================================
+
+* Change Detection Strategies:
+
+In Angular, Change Detection Strategy determines how and when the framework checks for changes in component data, triggering updates in the component's view. Angular provides two main strategies to manage change detection:
+
+- Default (ChangeDetectionStrategy.Default):
+
+Angular automatically checks the entire component tree whenever there's a potential change in the application (e.g., user input, HTTP response, etc.).
+
+- All components are checked for changes on every event like a click, HTTP response, or timer event.
+
+Pros: Simplifies handling updates as Angular will check everything.
+
+Cons: Can be less performant in large applications as it checks all components, even if the component's data hasn't changed.
+
+----------------------------------------------------------------------------------------
+
+- OnPush (ChangeDetectionStrategy.OnPush):
+
+Angular only checks a component when:
+
+An @Input property changes.
+An event originates from the component (e.g., a button click).
+A component explicitly triggers change detection using ChangeDetectorRef (e.g., markForCheck or detectChanges).
+
+Pros: More efficient because Angular skips change detection unless the component's inputs or events change, reducing unnecessary checks.
+
+Cons: Requires more manual control by the developer.
+
+------------------------------------------------------------------------------------
+
+How to Apply Change Detection Strategy
+
+You can set the change detection strategy for a component in its @Component decorator.
+
+1. Default Change Detection (Automatic Check)
+This is the default behavior, so you don’t need to set anything explicitly.
+
+typescript
+Copy code
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-default-strategy',
+  template: `<div>{{counter}}</div>`
+})
+export class DefaultStrategyComponent {
+  counter = 0;
+
+  increment() {
+    this.counter++;
+  }
+}
+Here, Angular will run change detection on every event, and the template will automatically update when the counter changes.
+
+2. OnPush Change Detection
+
+With OnPush, Angular checks the component only when an @Input changes or an event occurs from within the component.
+
+typescript
+Copy code
+import { Component, ChangeDetectionStrategy, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-onpush-strategy',
+  template: `<div>{{data}}</div>`,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class OnPushStrategyComponent {
+  @Input() data: string;
+}
+
+Important: The view will only update when the @Input data changes.
+
+Angular will not automatically run change detection for internal changes (like modifying properties not passed as @Input).
+
+Example of OnPush Strategy with ChangeDetectorRef
+
+Sometimes, even with OnPush strategy, you might need to manually trigger change detection. You can do this using ChangeDetectorRef.
+
+typescript
+Copy code
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
+
+@Component({
+  selector: 'app-manual-check',
+  template: `<div>{{counter}}</div>
+             <button (click)="increment()">Increment</button>`,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class ManualCheckComponent {
+  counter = 0;
+
+  constructor(private cd: ChangeDetectorRef) {}
+
+  increment() {
+    this.counter++;
+    // Manually trigger change detection
+    this.cd.markForCheck();
+  }
+}
+Here:
+
+OnPush strategy skips automatic detection.
+
+ChangeDetectorRef.markForCheck() manually tells Angular to run change detection for this component and its ancestors, updating the view when counter is incremented.
+
+- When to Use OnPush:
+
+Performance: Use OnPush when you want to optimize performance in large applications by avoiding unnecessary checks for components that don’t frequently change.
+
+Immutable Data: Best used with immutable data (e.g., with the Redux pattern or when using RxJS observables) to detect changes efficiently.
+
+Summary:
+
+Default (ChangeDetectionStrategy.Default): Checks the entire component tree for changes on every event.
+
+OnPush (ChangeDetectionStrategy.OnPush): Only checks the component if an @Input changes or when explicitly told to do so. It's more efficient but requires careful handling of change detection.
+
+By choosing the right change detection strategy, you can significantly improve the performance of your Angular application.
+========================================================================================
+In Angular, both markForCheck() and detectChanges() are related to manual change detection, especially when using:
+
+changeDetection: ChangeDetectionStrategy.OnPush
+
+But both work differently.
+
+1. markForCheck()
+
+It tells Angular:
+
+“This component has changed, please check it in the next change detection cycle.”
+
+It does NOT immediately update UI.
+
+Example
+constructor(private cd: ChangeDetectorRef) {}
+
+updateData() {
+  this.name = 'Gaurav';
+
+  this.cd.markForCheck();
+}
+What happens internally? => Angular marks component as dirty.
+
+On next change detection cycle: =>Angular checks this component ,UI updates
+
+When to use?
+
+Use when:
+
+Using OnPush
+
+Data changes from:
+setTimeout
+Observable
+external library
+manual object mutation
+
+Real-time Example
+@Component({
+  selector: 'app-user',
+  template: `{{user.name}}`,
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class UserComponent {
+
+  user = { name: 'GAURAV' };
+
+  constructor(private cd: ChangeDetectorRef) {}
+
+  ngOnInit() {
+
+    setTimeout(() => {
+      this.user.name = 'RAAJ';
+
+      this.cd.markForCheck();
+
+    }, 2000);
+
+  }
+}
+
+Without markForCheck(), UI may not update in OnPush.
+
+2. detectChanges()
+
+It tells Angular:
+
+“Run change detection RIGHT NOW for this component and its children.”
+
+Immediate UI update.
+
+Example
+constructor(private cd: ChangeDetectorRef) {}
+
+updateData() {
+  this.name = 'Gaurav';
+
+  this.cd.detectChanges();
+}
+- What happens internally?
+Angular instantly:
+checks component
+updates DOM
+checks child components also
+No waiting for next cycle.
+
+Real-time Example
+setTimeout(() => {
+
+  this.name = 'Updated';
+
+  this.cd.detectChanges();
+
+}, 2000);
+
+UI updates immediately.
+
+Main Difference
+
+Feature	                            markForCheck()	               detectChanges()
+Immediate update	                    ❌ No                   	     ✅ Yes
+Runs full check instantly           	❌ No	                       ✅ Yes
+Marks component dirty	                ✅ Yes	                       ❌ No
+Used with OnPush	                    ✅ Mostly                    	✅ Mostly
+Performance	                           Better	                       Costlier
+
+
+Easy Interview Answer
+- markForCheck()
+
+It marks OnPush component for checking in next change detection cycle. It does not run change detection immediately.
+
+- detectChanges()
+
+It manually triggers change detection immediately for current component and child components.
+

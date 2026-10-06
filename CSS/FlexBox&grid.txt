@@ -1,0 +1,72 @@
+Difference Between CSS Grid and Flexbox
+
+Both Flexbox and CSS Grid are used to create layouts, but they are designed for different purposes.
+
+- Flexbox	                                                 CSS Grid
+One-dimensional layout	                                 Two-dimensional layout
+Works with row OR column	                             Works with rows AND columns
+Best for aligning items in a single direction	         Best for creating complete page/component layouts
+Content-driven layout	                                 Layout-driven structure
+Great for small components                               Great for complex layouts
+
+1. Flexbox — One-Dimensional
+
+Flexbox mainly works in one direction at a time.
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+Example:
+
+[Item 1] [Item 2] [Item 3]
+
+You can also change direction:
+
+flex-direction: column;
+
+Best use cases:
+
+Navigation bars
+Buttons
+Aligning items
+Header layouts
+Centering elements
+
+2. CSS Grid — Two-Dimensional
+
+Grid works with both rows and columns simultaneously.
+
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 20px;
+}
+
+Example:
+
++---------+---------+---------+
+| Item 1  | Item 2  | Item 3  |
++---------+---------+---------+
+| Item 4  | Item 5  | Item 6  |
++---------+---------+---------+
+
+Best use cases:
+
+Dashboard layouts
+Complex page layouts
+Card grids
+Image galleries
+Layouts requiring row and column control
+
+Simple Interview Answer
+
+"Flexbox is a one-dimensional layout system, meaning it is mainly used to arrange items in either a row or a column. CSS Grid is a two-dimensional layout system that allows us to control both rows and columns at the same time. I generally use Flexbox for component-level alignment and Grid for more complex two-dimensional layouts."
+
+Easy way to remember:
+
+Flexbox → 1 direction ↔️ or ↕️
+Grid → Rows + Columns 🟦

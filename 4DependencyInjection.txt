@@ -1,0 +1,78 @@
+Page 16 — Services / Dependency Injection
+
+Services :
+
+Service is a typescript class which contain client-side business logic which is involving in loading the data from servers, by making Ajax call to the Rest API server.
+
+API → Application programming Interface
+
+Dependency Injection
+
+Dependency injection is the concept of creating service objects at runtime automatically and loading these service object into the constructor of the component as per the necessity of the components.
+
+Angular uses dependency injection to manage how diff pieces of an application interact with each other.
+
+Create service
+import
+
+@Injectable({
+ providedIn : 'root'
+})
+
+export class Dservice {
+
+ constructor(private http : HttpClient)
+
+ get method() {
+
+ }
+}
+Page 17 — Dependency Injection Working
+
+Before DI →
+
+in class {
+ private dataService = DataService()
+
+ constructor() {
+   this.dataService = new DataService()
+ }
+}
+
+It was tightly couple. It directly depends on a concrete instance of Dataservice.
+
+Orig complexity, Reduces flexibility and makes code less modular
+
+Hard To Test
+Create Component
+import
+
+@Component({
+
+})
+
+export class {
+
+ constructor(private dataservice : DataService) {}
+
+ ngOnInit(): void {
+   use this dataservice
+ }
+}
+
+How dependency Injection work here:
+
+Service Registration :
+
+The dataservice is decorated with @Injectable({ providedIn : 'root' })
+
+This means angular will create a single instance of this service and provide it throughout the application (frontend)
+
+Injecting the service :
+
+In component → constructor → we declare private property dataservice of Dataservice. Angular automatically injects an instance of Dataservice into this property
+
+Using the service :
+
+ngOnInit → call method → to fetch the data and then assign it to the component data.
+

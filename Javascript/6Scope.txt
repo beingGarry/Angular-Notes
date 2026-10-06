@@ -1,0 +1,176 @@
+================================================================================
+TOPIC 6: SCOPE
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+* The scope is WHERE a variable is ACCESSIBLE. JavaScript Loops, Functions, and Blocks have scope. If a variable is not accessible in some place, we get an error that the variable is not defined. It means we are trying to access it out of its scope. The variable is out of range where it is being asked to be available.
+
+TYPES OF SCOPE:
+2.1. Global Scope
+2.2. Block Scope
+2.3. Functional Scope
+2.4. Loop Scope
+
+
+2.1 GLOBAL SCOPE
+-----------------
+Variables defined in Global Scope can be accessed from ANYWHERE. Properties in the global window object can be accessed in any file of the code.
+
+- VAR variables declared OUTSIDE functions are global variables and get ATTACHED TO the WINDOW OBJECT.
+- LET/CONST variables declared OUTSIDE functions are also global but accessible ANYWHERE IN THE CURRENT FILE ONLY. They do NOT get attached to window object.They are in their own 'Script' memory.
+- Undeclared variables become global and get attached to the window object (in non-strict mode).
+
+DO NOT DECLARE GLOBAL VARIABLES UNLESS REALLY NEEDED. You can mistakenly override existing global variables or properties present on the window object.
+
+
+2.2 BLOCK SCOPE
+----------------
+Variables declared with LET and CONST inside a block {} have block scope and are NOT accessible outside the block. "VAR is NOT block-scoped".
+
+{
+  let a = 1;
+  const b = 2;
+  var c = 3;
+}
+console.log(a) // error: a is not defined
+console.log(b) // error: b is not defined
+console.log(c) // 3 -- var CAN be accessed outside block
+
+
+2.3 FUNCTIONAL SCOPE
+---------------------
+Variables declared INSIDE any function with var, let, or const have FUNCTIONAL SCOPE. They are ONLY accessible INSIDE the function.
+
+function x(d) {
+  var a = 1;
+  let b = 2;
+  const c = 3;
+  console.log(a, b, c, d); // 1, 2, 3, 4 - all work inside
+}
+x(4);
+console.log(a); // ERROR: a is not defined
+
+
+2.4 LOOP SCOPE
+---------------
+The loop variable declared with VAR can be accessed inside AND outside the loop.
+The loop variable declared with LET cannot be accessed outside the loop.
+
+for(var i = 0; i < 3; i++){ console.log(i) } // 0, 1, 2
+console.log(i) // 3 (accessible outside!)
+
+for(let i = 0; i < 3; i++){ console.log(i) } // 0, 1, 2
+console.log(i) // ERROR: i is not defined
+
+
+SCOPE CHAIN
+------------
+JavaScript always looks for the variable definition in its LOCAL SCOPE first. If not found, then it will look in the PARENT scope. Still not found, then PARENT of PARENT, and so on, until it reaches the global window object. This search happens in a LEXICAL (hierarchical) manner from INWARDS to OUTWARDS (child to parent to grandparent). This whole chain is called the SCOPE CHAIN.
+
+JavaScript does NOT go through its CHILD scope to search for a variable.
+
+
+LEXICAL ENVIRONMENT
+--------------------
+In simple words, it is the execution context of the current scope and its parent's lexical scope. Whenever a function or block is created, the lexical environment is also formed. It consists of the current scope and parent scope.
+
+// Example of scope chain
+function outer() {
+  function z() {
+    function y() {
+      function x() {
+        console.log(1);
+      }
+      x();
+    }
+    y();
+  }
+  z();
+}
+outer();
+
+
+EXAMPLES (Interview Problems)
+------------------------------
+
+// Problem 1
+var a = 1;
+{ var a = 2; console.log('Inside', a); }
+console.log('Outside', a);
+OUTPUT: Inside, 2; Outside, 2
+REASON: var is NOT block scoped. Same variable, redeclared and reassigned to 2.
+
+// Problem 2
+let a = 1;
+{ let a = 2; console.log('Inside', a); }
+console.log('Outside', a);
+OUTPUT: Inside, 2; Outside, 1
+REASON: let IS block scoped. Inner 'a' (= 2) is different from outer 'a' (= 1).
+
+// Problem 3
+const a = 1;
+{ const a = 2; console.log('Inside', a); }
+console.log('Outside', a);
+OUTPUT: Inside, 2; Outside, 1
+REASON: Same as Problem 2. const also has block scope.
+
+// Problem 4
+var a = 1;
+function x() { var a = 2; console.log('Inside Function', a); }
+x();
+console.log('Outside Function', a);
+OUTPUT: Inside, 2; Outside, 1
+REASON: var inside function has functional scope.
+
+// Problem 7 (Scope Chain)
+var a = 1; var b = 2;
+function outer() {
+  var a = 3; var b = 4;
+  function inner() { console.log(a, b); }
+  inner();
+}
+outer();
+console.log(a);
+console.log(b);
+OUTPUT: 3, 4 then 1, 2
+REASON: inner has no a or b, searches parent (outer) -> finds 3,4.
+        Outside: inner's variables are not accessible outside outer.
+
+// Problem 8 (Scope Chain - each function has its own a and b)
+var a = 1; var b = 2;
+function outer() {
+  var a = 3; var b = 4;
+  function inner() {
+    var a = 5; var b = 6;
+    console.log('Inner', a, b);
+  }
+  inner();
+  console.log('Outer', a, b);
+}
+outer();
+console.log('Global', a, b);
+OUTPUT: Inner 5, 6 | Outer 3, 4 | Global 1, 2
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is scope in JavaScript?
+A1. Scope is where a variable is accessible. JavaScript has global scope, block scope, functional scope, and loop scope.
+
+Q2. What is the scope chain?
+A2. JavaScript looks for a variable in local scope first. If not found, it goes to the parent scope, then parent's parent, until the global window object. this chain of searching is called the scope chain.
+
+Q3. What is lexical environment?
+A3. The execution context of the current scope combined with its parent's lexical scope. A function's lexical environment is its current scope + outer scope.
+
+Q4. What is the difference between var, let, const in terms of scope?
+A4. var: global scope (outside function) or functional scope (inside function)
+        NOT block scoped.
+    let/const: global scope (outside all), functional scope (inside function),
+               block scope (inside block {}).
+
+Q5. Can JavaScript access variables from child scope?
+A5. No. JavaScript only looks from child -> parent direction in scope chain,
+    never from parent -> child.
+

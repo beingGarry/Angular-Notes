@@ -1,0 +1,821 @@
+1. What is HTML?
+
+HTML (HyperText Markup Language) is used to create the structure of web pages.
+
+Example:
+
+<h1>Hello</h1>
+<p>This is paragraph</p>
+h1 → heading
+p → paragraph
+
+Angular templates are also HTML files with extra Angular syntax.
+
+2. Semantic HTML (Very Important)
+
+- Semantic tags describe the meaning of content.
+
+Example:
+
+<header></header>
+<nav></nav>
+<section></section>
+<article></article>
+<footer></footer>
+
+- Why Important?
+
+Better SEO
+Better accessibility
+Better readability
+Screen readers understand structure
+
+Interview Question
+
+Q: Difference between div and semantic tags?
+
+Answer:
+div has no meaning. Semantic tags describe the purpose of content.
+
+Example:
+
+<div>Menu</div>
+<nav>Menu</nav>
+
+nav is better because browser and screen readers understand it is navigation.
+
+3. Block vs Inline Elements
+- Block Elements Take full width.
+- Block elements start from new line and take full width.
+
+Examples:div, p, h1, section
+
+- Inline Elements Take only required width.
+- Inline elements stay in same line and take only required content width
+
+Examples: span, a, strong
+
+Interview Question
+Q: Difference between block and inline elements?
+
+Answer:
+Block elements start from new line and take full width.
+Inline elements stay in same line and take only required content width.
+
+4. ID vs Class
+- ID : Unique element => <div id="header"></div>
+
+- Class : Reusable =>  <div class="card"></div>
+Interview Question
+Q: Difference between id and class?
+
+Answer:
+
+id should be unique
+class can be reused on multiple elements
+
+5. Forms in HTML (Very Important for Angular)
+
+Example:
+
+<form>
+  <input type="text">
+  <button>Submit</button>
+</form>
+
+- Important Input Types
+text
+email
+password
+number
+checkbox
+radio
+date
+file
+
+Interview Question
+Q: Difference between GET and POST?
+
+Answer:
+
+GET
+Data visible in URL
+Less secure
+Used for fetching data
+
+POST
+Data sent in request body
+More secure
+Used for sending sensitive data
+
+6. Label Tag Importance
+
+Example:
+
+<label for="name">Name</label>
+<input id="name">
+Why Important?
+Accessibility
+Clicking label focuses input
+
+Interview Question
+
+Q: Why use label tag?
+
+Answer:
+Improves accessibility and user experience.
+
+7. Tables
+
+Example:
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Age</th>
+  </tr>
+
+  <tr>
+    <td>John</td>
+    <td>25</td>
+  </tr>
+</table>
+
+- Important Tags
+table
+tr
+th
+td
+thead
+tbody
+
+8. HTML5 Features
+Semantic tags
+Audio/video support
+Local storage
+Session storage
+Canvas
+Geolocation
+
+9. Local Storage vs Session Storage
+Local Storage
+Permanent until manually cleared
+
+Session Storage
+Removed after browser tab closed
+
+Interview Question
+Q: Difference between localStorage and sessionStorage?
+
+Answer:
+localStorage persists permanently.
+sessionStorage exists only for current session/tab.
+
+10. Cookies vs Local Storage
+- Feature	        Cookies	            Local Storage
+Size	          Small	              Larger
+Sent to server	Yes	                No
+Expiry	        Can expire	        Manual clear
+
+11. DOM (Very Important)
+
+DOM = Document Object Model
+
+Browser converts HTML into DOM tree.
+
+Example:
+
+<body>
+  <h1>Hello</h1>
+</body>
+
+Browser creates DOM nodes.
+
+Angular also updates DOM dynamically.
+
+12. DOM Manipulation
+
+Example:
+
+document.getElementById("demo")
+Angular Perspective
+
+In Angular we avoid direct DOM manipulation because Angular handles rendering.
+
+Use:
+
+Property binding
+Structural directives
+Renderer2
+13. Difference Between HTML and DOM
+HTML
+
+Static markup file.
+
+DOM
+
+Live object created by browser.
+
+14. Meta Tags
+
+Example:
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+Important for Responsive Design
+
+15. Viewport Meta Tag
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+Why Important?
+
+Makes website responsive on mobile devices.
+
+16. Accessibility (Extremely Important)
+
+Angular interviews now ask accessibility questions.
+
+- Important Concepts
+aria-label
+semantic tags
+alt attribute
+keyboard navigation
+
+Example:
+
+<img src="logo.png" alt="Company Logo">
+
+17. Alt Attribute
+Interview Question
+Q: Why use alt attribute?
+
+Answer:
+Used for accessibility and image fallback text.
+
+18. iframe
+
+Used to embed another webpage.
+
+Example:
+
+<iframe src="https://example.com"></iframe>
+19. Audio and Video Tags
+<video controls>
+  <source src="movie.mp4">
+</video>
+20. Data Attributes
+
+Example:
+
+<div data-id="101"></div>
+
+Used for storing custom data.
+
+21. Difference Between span and div
+div
+
+Block element
+
+span
+
+Inline element
+
+22. Strong vs Bold
+strong
+
+Semantic importance
+
+b
+
+Only visual bold
+
+23. Required vs Placeholder
+required : Validation
+
+placeholder : Hint text
+
+24. HTML Entities
+
+Example:
+
+&lt;
+&gt;
+&amp;
+
+25. Responsive Design Basics
+Important Concepts
+Media queries
+Flexbox
+Grid
+Viewport
+
+26. Common Angular + HTML Interview Questions
+Q: What is semantic HTML?
+
+Answer:
+Semantic HTML uses meaningful tags like header, section, article, footer.
+
+Q: Why accessibility is important?
+
+Answer:
+Accessibility helps screen readers and differently abled users interact with website properly.
+
+Q: Difference between localStorage and cookies?
+
+Answer:
+Cookies are sent to server automatically. LocalStorage stays only in browser.
+
+Q: What is DOM?
+
+Answer:
+DOM is tree structure created by browser from HTML document.
+
+Q: Difference between inline and block elements?
+
+Answer:
+Block elements take full width and new line. Inline elements take only content width.
+
+* Q: Why use viewport meta tag?
+
+Answer:
+To make webpage responsive on mobile devices.
+
+Q: Difference between id and class?
+
+Answer:
+id is unique. class is reusable.
+
+Q: Why label tag is important?
+4
+Answer:
+Improves accessibility and user interaction.
+
+27. Angular-Specific HTML Questions
+Q: Difference between property binding and attribute binding?
+Property Binding
+<input [disabled]="isDisabled">
+
+Updates DOM property.
+
+Attribute Binding
+<td [attr.colspan]="2"></td>
+
+Updates HTML attribute.
+
+Q: Difference between interpolation and property binding?
+Interpolation
+{{title}}
+
+For displaying text.
+
+Property Binding
+[src]="imageUrl"
+
+For DOM properties.
+
+Q: What happens when Angular template loads?
+
+Answer:
+
+Angular compiles template
+Creates component view
+Binds data
+Runs change detection
+Updates DOM
+ 
+29. Event Bubbling
+
+Event moves from child to parent.
+
+Example:
+
+<div>
+  <button>Click</button>
+</div>
+
+Click on button also triggers div event.
+
+30. Prevent Event Bubbling
+event.stopPropagation()
+
+31. Difference Between display:none and visibility:hidden
+display:none
+
+"Element removed from layout."
+
+visibility:hidden
+
+"Element hidden but space remains."
+
+32. Flexbox Basics (Very Important)
+Important Properties
+display: flex;
+justify-content
+align-items
+flex-direction
+gap
+Interview Question
+Q: Difference between justify-content and align-items?
+
+Answer:
+
+justify-content works on main axis
+align-items works on cross axis
+
+33. HTML Best Practices
+Use semantic tags
+Avoid inline styles
+Use accessibility attributes
+Keep structure clean
+Use labels in forms
+Optimize images
+
+
+1. Semantic HTML
+
+Semantic HTML means using meaningful tags that describe content structure.
+
+Example:
+
+<header></header>
+<nav></nav>
+<main></main>
+<section></section>
+<article></article>
+<footer></footer>
+
+Instead of:
+
+<div class="header"></div>
+Why Important?
+Better SEO
+Better accessibility
+Better maintainability
+Screen readers understand page structure
+
+Interview Question
+Q: Difference between semantic and non-semantic tags?
+Semantic Tags => Meaningful:
+
+<nav>
+<footer>
+<article>
+
+Non-Semantic Tags => No meaning:
+
+<div>
+<span>
+Angular Perspective
+
+Angular templates should use semantic tags for accessibility and SEO.
+
+Example:
+
+<app-header></app-header>
+
+<main>
+  <section>
+    Content
+  </section>
+</main>
+2. Accessibility (Very Important)
+'"
+Accessibility means making websites usable for all users including disabled users."'
+
+Important Concepts
+a) alt Attribute
+<img src="logo.png" alt="Company logo">
+
+Used for screen readers.
+
+b) Label Tag
+<label for="email">Email</label>
+<input id="email">
+
+Improves keyboard and screen reader support.
+
+c) ARIA Attributes
+<button aria-label="Close Popup">X</button>
+
+ARIA = Accessible Rich Internet Applications
+
+d) Keyboard Accessibility
+
+Users should navigate using:
+
+Tab
+Enter
+Escape
+Interview Questions
+
+Q. Why accessibility is important?
+
+Answer:
+
+Helps disabled users
+Improves SEO
+Better usability
+Required in enterprise projects
+
+Q: What is ARIA?
+
+Answer:
+- ARIA attributes provide extra accessibility information to assistive technologies.
+
+3. DOM (Document Object Model)
+
+Browser converts HTML into tree-like object structure.
+
+Example:
+
+<body>
+  <h1>Hello</h1>
+</body>
+
+Browser creates DOM nodes.
+
+DOM Tree
+Document
+ └── html
+      └── body
+           └── h1
+Interview Question
+Q: Difference between HTML and DOM?
+HTML	                              DOM
+Static file                       	Live object
+Markup	                            Browser representation
+Written by developer	              Generated by browser
+
+Angular Perspective
+
+Angular updates DOM automatically using change detection.
+
+4. Event Bubbling
+
+Event flows from child to parent.
+
+Example:
+
+<div onclick="parent()">
+  <button onclick="child()">Click</button>
+</div>
+
+Clicking button triggers:
+
+child()
+parent()
+Why?
+
+Because event bubbles upward.
+
+Stop Bubbling
+event.stopPropagation()
+
+Interview Question
+Q: What is event bubbling?
+
+Answer:
+Event starts from target element and propagates upward to parent elements.
+
+5. Event Capturing
+
+Opposite of bubbling.
+
+Flow:
+
+Parent → Child
+
+- Bubbling => Child → Parent
+
+Interview Question
+Q: Difference between bubbling and capturing?
+Bubbling	                  Capturing
+Child → Parent	            Parent → Child
+Default behavior	          Optional
+6. Local Storage
+
+Stores data permanently in browser.
+
+Example:
+
+localStorage.setItem("name", "John")
+
+Retrieve:
+
+localStorage.getItem("name")
+
+Features
+Persistent
+Not sent to server
+5–10 MB storage
+
+7. Session Storage
+
+Same as localStorage but cleared when tab closes.
+
+Example:
+
+sessionStorage.setItem("token", "123")
+Difference
+localStorage	                   sessionStorage
+Permanent	                        Temporary
+Shared across tabs	             Per tab
+8. Cookies
+
+- Small browser storage sent automatically to server.
+
+Example:
+
+document.cookie = "username=John"
+Uses
+Authentication
+Session management
+
+Difference Between Cookies and Local Storage
+Cookies	                        Local Storage
+Sent to server	                  sent
+Small size	                    Larger
+Can expire	                    Manual clear
+9. Responsive Design
+
+Website adapts to different screen sizes.
+
+Important Techniques
+a) Media Queries
+@media(max-width:768px) {
+  .container {
+    width:100%;
+  }
+}
+b) Flexible Layouts
+
+Use:
+
+Flexbox
+Grid
+Relative units
+c) Viewport Meta Tag
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+Interview Question
+Q: What makes website responsive?
+
+Answer:
+
+Media queries
+Flexible layouts
+Responsive images
+Viewport settings
+
+10. Flexbox Basics (Very Important)
+
+Used for 1D layouts.
+
+Enable Flexbox
+display: flex;
+
+Important Properties
+justify-content
+
+Main axis alignment.
+
+justify-content: center;
+
+align-items
+
+Cross axis alignment.
+
+align-items: center;
+flex-direction
+flex-direction: row;
+flex-direction: column;
+gap
+gap: 10px;
+Interview Question
+Q: Difference between justify-content and align-items?
+
+Answer:
+
+justify-content aligns items on main axis
+align-items aligns items on cross axis
+11. Forms
+
+Forms collect user input.
+
+Example:
+
+<form>
+  <input type="text">
+  <button>Submit</button>
+</form>
+Important Input Types
+text
+email
+password
+checkbox
+radio
+file
+date
+number
+12. Input Validation
+HTML Validation
+<input required minlength="3">
+Angular Validation
+
+Reactive Forms:
+
+Validators.required
+Validators.email
+Validators.minLength()
+Interview Question
+Q: Difference between HTML validation and Angular validation?
+HTML Validation	Angular Validation
+Browser-based	Framework-controlled
+Limited	Powerful
+Harder to customize	Easy customization
+13. Meta Tags
+
+Provide metadata about webpage.
+
+Example:
+
+<meta charset="UTF-8">
+<meta name="description" content="Angular tutorial">
+Important Meta Tags
+Charset
+<meta charset="UTF-8">
+Viewport
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+Description
+<meta name="description" content="Frontend tutorial">
+14. SEO Basics
+
+SEO = Search Engine Optimization
+
+Helps search engines understand webpage.
+
+Important SEO Concepts
+Semantic HTML
+
+Use:
+
+<header>
+<main>
+<article>
+Proper Heading Structure
+<h1>Main Title</h1>
+<h2>Sub Title</h2>
+Meta Description
+<meta name="description" content="Angular course">
+Image Alt Text
+<img alt="Angular logo">
+Angular SEO
+
+Client-side rendering has SEO limitations.
+
+Solutions:
+
+SSR (Server Side Rendering)
+Angular Universal
+Interview Question
+Q: Why SSR improves SEO in Angular?
+
+Answer:
+SSR sends fully rendered HTML from server, so search engines can crawl content easily.
+
+Most Important Questions for Angular Interviews
+Q1: Difference between localStorage, sessionStorage, and cookies?
+Feature	localStorage	sessionStorage	Cookies
+Expiry	Permanent	Tab close	Configurable
+Size	Large	Large	Small
+Sent to server	No	No	Yes
+Q2: Difference between event bubbling and capturing?
+Bubbling	Capturing
+Child → Parent	Parent → Child
+Q3: Why semantic HTML is important?
+
+Answer:
+Improves SEO, accessibility, and maintainability.
+
+Q4: Difference between HTML validation and Angular validation?
+
+Answer:
+HTML validation is browser-native and limited. Angular validation is customizable and reactive.
+
+Q5: Difference between Flexbox and Grid?
+Flexbox	Grid
+1D layout	2D layout
+Row OR column	Rows AND columns
+Real Interview Tip
+
+For 4–5 years experience:
+
+Don’t answer in one line.
+Explain:
+Definition
+Internal behavior
+Real-world use case
+Angular relation
+
+Example:
+
+“We use semantic HTML for accessibility and SEO. In Angular applications it becomes even more important because SPA applications already have SEO challenges.”

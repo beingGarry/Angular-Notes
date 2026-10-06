@@ -1,0 +1,48 @@
+— Constructor vs ngOnInit()
+
+What is the diff bet’n the Constructor and ngOnInit()
+
+Constructor and ngOnInit seem the same, but they are called at diff phases.
+
+Angular has two phases :
+
+Bootstrapping phase
+Change detection phase
+
+Constructor :
+
+The constructor is called at Bootstrapping phase.
+This phase is when angular create the instances of services, pipe, components and directives in our module.
+Angular initializes the component and resolves its dependencies and passes it to the constructor.
+
+The change detection phase happens after the bootstrapping phase. This is mechanism where angular detects change in state of a component/directive and update the DOM to reflect as such.
+
+Angular detect this using zone.js
+
+At the change detection phase, these Hooks are called in sequence.
+
+Oninit
+Docheck
+Onchanges.
+Page 27 — ngOnInit Detailed
+
+A constructor is automatically called when an instance of class is created. It initialized the properties of the class and does any other necessary setup.
+It is used to inject dependencies, such as service and other component.
+NgOnInit()
+
+→ Is a lifecycle hook in angular that is called after the constructor is called and after the component input have been initialized.
+
+It is used to perform any additional initialization that is required for a component.
+ngOnit is commonly used for to call services or to setup subscriptions.
+Constructor
+execute before ngOnit
+used for dependency injection and initializing instance variable
+Can not Access the component DOM
+Executed everytime a component is created
+Can be used in class and directive
+NgOnit
+after the constructor
+initialization task the required component to be fully initialized.
+Can access
+executed after compo only once after component initialized
+Only use available in class that uses onit interface

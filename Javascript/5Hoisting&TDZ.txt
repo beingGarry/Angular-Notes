@@ -1,0 +1,135 @@
+================================================================================
+TOPIC 5: HOISTING AND TEMPORAL DEAD ZONE
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+* Hoisting is accessing the variables and functions BEFORE declaration. It would be fine for certain types and no errors will be thrown.
+
+- In JavaScript, the variables (not all) and functions (not all) can be accessed before they are declared. No error will be thrown for certain types. This phenomenon is called HOISTING.
+
+The reasoning lies within how code runs behind the scenes. In the MEMORY PHASE of the Global Execution Context:
+- Variables declared with VAR: stored with value 'undefined'
+- Function DECLARATIONS: stored with their complete function definition
+
+* Variables declared with LET/CONST: stored in a SEPARATE memory called 'Script' which cannot be accessed until a value is assigned.
+
+So when we access a var variable before its declaration, we get 'undefined'. When we call a function declaration before its definition, it works perfectly.
+
+NOTE:
+- undefined = variable is declared but has no value assigned to it.
+- Not Defined = variable is not even declared, not present in memory at all.
+
+
+EXAMPLES
+---------
+
+// VAR - Hoisting Works
+console.log(x); // undefined (NOT an error!)
+foo();          // logs 2 (works perfectly!)
+
+var x = 1;
+function foo() { console.log(2); }
+
+// WHY? In memory phase:
+// - x is stored as undefined
+// - foo is stored as its complete definition
+// In code execution: console.log(x) -> x is in memory = undefined
+//                    foo() -> foo is in memory = full function, so it runs
+
+
+* LET - Hoisting DOES NOT work like var
+console.log(x); // ERROR: Cannot access 'x' before initialization
+let x;
+
+WHY ERROR?
+- Let variables are stored in SEPARATE memory called 'Script'
+- Script memory CANNOT be accessed before a defined value is assigned to it
+- So accessing it before initialization throws Reference Error
+
+
+// CONST - Same behavior as let
+console.log(x); // Error: Missing initializer in const declaration
+const x;
+
+
+// FUNCTION EXPRESSION - Does NOT hoist like function declaration
+greeting(); // ERROR: greeting is not a function
+
+var greeting = function() {
+  console.log('hi');
+}
+
+WHY ERROR?
+- 'greeting' is a var variable. In Memory Phase, greeting = undefined
+- When we try to call greeting(), we're calling undefined() which is not a function
+- So hoisting doesn't work the same way for function expressions
+
+
+// FUNCTION DECLARATION - Works fine
+greet(); // Works! logs 'hi'
+
+function greet() {
+  console.log('hi');
+}
+
+
+TEMPORAL DEAD ZONE (TDZ)
+--------------------------
+* This is the ZONE or the time difference between the DECLARATION of the variable/function with let/const and ASSIGNING some defined value to it.
+ 
+If we access any variable/function declared with let/const during the temporal dead zone, the REFERENCE ERROR would be thrown:
+"Cannot access variable before initialization"
+
+The let and const variables are present in the Script Memory, which we cannot access before some value is present in it. If we do, we're accessing the variable in the temporal dead zone.
+
+
+KEY POINTS
+-----------
+1. Hoisting = accessing variables before initializing them.
+2. VAR variables and FUNCTION DECLARATIONS can be hoisted (var = undefined, functions = their full definition).
+3. LET/CONST variables and FUNCTION EXPRESSIONS are NOT hoisted the same way. They are in Script memory which cannot be accessed until initialized.
+4. Temporal Dead Zone: Time between declaring let/const variable and assigning a defined value to it.
+
+
+REAL-TIME EXAMPLES
+-------------------
+- If you call a utility function before defining it in your file (using function
+  declaration), it works due to hoisting.
+- If you accidentally try to access a let/const variable before its initialization
+  (e.g., inside an if block), you'll get TDZ error.
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is hoisting?
+A1. Hoisting is JavaScript's behavior of moving variable and function declarations to the top of their scope before code execution. Actually,what happens is in the Memory Phase, variables (var) are stored as 'undefined' and function declarations are stored as their full definition.
+
+Q2. What is the difference between undefined and not defined?
+A2. undefined: variable is declared but no value assigned yet. not defined: variable is not even declared, not present in memory at all.
+
+Q3. Does hoisting work with let and const?
+A3. No, not the same way. let/const are stored in a separate 'Script' memory that cannot be accessed before initialization, leading to TDZ error.
+
+Q4. What is Temporal Dead Zone?
+A4. The time/zone between the declaration of a let/const variable and when a value is assigned to it. Accessing the variable in this zone throws a Reference Error.
+
+Q5. What is the output?
+    console.log(x);
+    foo();
+    var x = 1;
+    function foo() { console.log(2); }
+A5. Output: undefined, 2
+    - x is undefined (var hoisted to memory as undefined)
+    - foo() works (function declaration fully hoisted)
+
+Q6. What is the output?
+    console.log(x);
+    var x = 1;
+    console.log(x);
+    console.log(y);
+A6. undefined, 1, Error: y is not defined
+    - First console: x is in memory as undefined
+    - Second console: x is now assigned 1
+    - Third console: y was never declared, so ReferenceError
+
+

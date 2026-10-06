@@ -1,0 +1,76 @@
+Interview-ready answer: CI/CD Architecture
+
+In our project, we use "AWS services" to automate the CI/CD deployment process.
+Our source code is maintained in "AWS CodeCommit", and we have different branches for different environments, such as UAT, QA and PROD.
+When code is merged or pushed to the UAT branch, it triggers the "AWS CodePipeline" automatically.
+The pipeline then starts the build process using "AWS CodeBuild". During the build, dependencies are installed using npm, and then we run the Angular production build with the required environment configuration.
+The Angular build generates the optimized files inside the "dist folder". These generated files are treated as deployment artifacts and are stored in an "S3 bucket".
+Then the deployment stage takes these build artifacts and deploys them to the required hosting environment. => Nginx
+We also maintain different environment configurations, such as environment.ts and environment.uat.ts, so that the application uses the appropriate API endpoints and configuration for each environment.
+After deployment, the QA team performs testing, and application logs and AWS services are monitored for any issues.
+
+🧠 Easy way to remember
+Just remember this flow:
+CodeCommit → CodePipeline → CodeBuild → S3 → Deployment → QA
+You can draw it like this:
+Developer
+    │
+    │ Push / Merge
+    ▼
+┌──────────────┐
+│ AWS CodeCommit│
+│ Source Code   │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ CodePipeline │
+│ Automation   │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ AWS CodeBuild│
+│              │
+│ npm install  │
+│ Angular Build│
+└──────┬───────┘
+       │
+       │ dist/
+       ▼
+┌──────────────┐
+│ S3 Bucket    │
+│ Build        │
+│ Artifacts    │
+└──────┬───────┘
+       │
+       ▼
+┌──────────────┐
+│ Deployment   │
+│ Environment  │
+└──────┬───────┘
+       │
+       ▼
+      QA
+
+If they ask: "What exactly happens during the build?"
+Say:
+"When CodeBuild starts, it installs the dependencies using npm. Then we run the Angular build command with the required environment configuration. Angular generates the optimized JavaScript, CSS and other static files inside the dist folder. These files become our deployment artifacts and are then stored in S3."
+
+If they ask: "Why do you need different environment files?"
+"Because each environment can have different configurations, especially different backend API endpoints. For example, UAT should communicate with UAT APIs and production should communicate with production APIs. Angular's environment configuration allows us to use the correct configuration during the build."
+
+If they ask: "What is CodePipeline doing?"
+Simple answer:
+"CodePipeline is orchestrating the complete CI/CD flow. It detects the code change, triggers the build, takes the generated artifact and moves it through the deployment stages."
+
+If they ask: "What is CodeBuild doing?"
+"CodeBuild is responsible for actually building the application. It installs dependencies, runs the Angular build and generates the deployment-ready files."
+
+⚠️ One thing to be careful about
+Your handwritten note says:
+AWS CodeDeploy → deploy to Nginx/S3
+
+Make sure you know your actual deployment target before saying this in the interview. If your Angular static files are ultimately hosted from S3, say that. If they are deployed onto an Nginx server, say Nginx. Don't claim both unless your actual pipeline uses both.
+For an Angular L2 interview, the strongest one-line summary is:
+"We use AWS CodeCommit for source control, CodePipeline for CI/CD orchestration, CodeBuild for Angular builds, and S3 for storing deployment artifacts, followed by deployment to the respective environment."

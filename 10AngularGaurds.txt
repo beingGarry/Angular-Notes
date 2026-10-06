@@ -1,0 +1,119 @@
+ — Guards
+
+Guards
+Guards are special classes used to control and manage access to diff part of an application.
+They decide whether a user can navigate to a particular route or perform certain action based on specified conditions like checking if the user is logged in or has the necessary permissions.
+Guards acts as gatekeeper, allowing or preventing access to diff part of the application, ensuring security and controlling the flow of navigation within the app.
+Angular mainly support 2 type of Guards.
+CanActivate — Execute before entering into a route
+CanDeactivate — Execute before leaving a route
+CanActivate use case →
+
+Lets you have application with dashboard page that should only be accesible to authenticated user.
+
+The can activate guard ensure that only authenticated user can access it, and redirecting unauthenticated user to the login page.
+
+Page 35 — AuthGuard Example
+
+AuthGuard service.ts
+export class AuthGuard implements CanActivate {
+
+ constructor(
+   private authservice : Authservice,
+   private route : Route
+ ) {}
+
+ CanActivate() : Boolean {
+
+   if(this.authservice.isAuthenticated()) {
+     return true;
+   } else {
+     this.route.navigate(['/login'])
+     return false;
+   }
+ }
+}
+Route configuration
+Const routes : Routes = [
+
+ {
+   path : 'dashboard',
+   component : Dashboard
+   canActivate : [AuthGuard]
+ }
+];
+
+// apply the authguard to protect dashboard
+
+Authservice :
+
+This assume there’s an Authservice that provide method isAuthenticated() to check if the user is logged in.
+
+Page 36 — CanActivateChild Guard
+
+The canActivate guard execute before entering into a route.
+This guard can be created by implementing canActivate interface
+canActivate interface has method called canActivate
+This method must return boolean value, which indicates whether route can be navigated or not.
+If the return true, the route will be navigated
+if we return false, the route navigation will be stopped.
+CanActivateChild :
+
+similar to canActivate, but it works on child routes.
+
+useful for feature module with multiple child routes.
+
+usecase →
+
+If your application has with multiple child routes like profile setting, Account-setting.
+
+You can use canActivateChild guard to ensure that only user with appropriate permission can acess this child route.
+
+Routes [
+ {
+   path : '',
+   component : ,
+   canActivateChild : [AuthGuard]
+ }
+]
+Page 37 — CanDeactivate / Resolve Guard
+
+Can deactivate
+The candeactive guard executes before leaving from a route.
+created by implementing candeactivate interface
+This guard works when your navigating away from a component. It is often used to warn the user about unsaved changes.
+
+usecase :
+
+You have a form page for editing info. If user makes changes but tries to navigate away without saving.
+
+CanDeactivate guard can prompt them to either save the changes or confirm that they want to leave without saving.
+
+Resolve
+
+A Resolve guard fetches data before navigation complete. The data can be used to populate route parameter,
+
+usecase :
+
+In commerce application, you have product details page. A Resolve guard can pre-fetch the product details before the route is activated, ensuring that the user doesn’t see an empty or partially loaded page.
+
+Page 38 — CanLoad Guard
+
+CanLoad
+
+CanLoad check module is lazy-loaded or not.
+
+This is important if you want to prevent unauthorized user from downloading parts of your appl—
+
+useCase :
+
+Your application has a premium feature module that should only be accessible (and thus download) by premium users. A canload guard can prevent unauthorized user from even downloading this module and saving bandwidth and enhancing security.
+
+Const routes : Routes = [
+ {
+   path : 'feature',
+   loadChildren : () => import('./feature/feature.module')
+   .then(m => m.featureModule),
+   canLoad : [AuthGuard]
+ }
+]

@@ -1,0 +1,185 @@
+================================================================================
+TOPIC 7: CLOSURES
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+* Whenever there are two functions bundled together, the INNER function can access the variables declared in the OUTER function, even after the outer function has been executed. This phenomenon is called CLOSURE.
+
+The inner function forms a closure with its LEXICAL SCOPE. The lexical scope of a function is the ability to access variables defined in its PARENT scope and its parent's parent scope and so on until the global window object.
+
+NOTE: The child function will still have access to the variables declared in the parent function, EVEN AFTER the parent function is completed. The child function somehow "remembers" the closure variables even after the parent is done.
+
+Usually, variables defined in a function are not accessible once the function is done executing. But that is NOT the case with closures.
+
+KEY POINTS:
+1. A function bundled with its lexical surroundings forms a closure.
+2. An inner function will make a closure with its outer function and outer's outer function and so on until the global window object.
+3. An inner function will have access to all variables defined in all outer functions EVEN IF the outer functions are done executing.
+4. Only variables that are ACTUALLY USED in the inner function will be included in the closure object (not all variables from parent).
+
+
+EXAMPLES
+---------
+
+// Basic Closure Example
+function parent() {
+  let a = 1;
+  function child() {
+    console.log(a); // can access 'a' from parent
+  }
+  child();
+}
+parent(); // logs: 1
+
+// If you set a debugger here, you'll see a 'Closure' object
+// with { a: 1 } in browser DevTools Scope panel.
+
+
+// More than one closure variable
+// Only used variables appear in Closure object
+function parent() {
+  let a = 1;
+  let b = 2;
+  let c = 3; // NOT used in child
+  function child() {
+    console.log(a);
+    console.log(b);
+  }
+  child();
+}
+// Closure object will have { a: 1, b: 2 } -- 'c' is NOT in closure
+
+
+// Multiple levels (grandParent)
+function grandParent() {
+  let a = 1;
+  function parent() {
+    function child() {
+      console.log(a); // still accessible!
+    }
+    child();
+  }
+  parent();
+}
+// child forms closure with grandParent even at top level wrapper
+
+
+// Multiple closures (closure with both parent and grandParent)
+function grandParent() {
+  let a = 1;
+  function parent() {
+    let b = 2;
+    function child() {
+      console.log(a, b); // uses both
+    }
+    child();
+  }
+  parent();
+}
+// child makes TWO closures: one with parent { b:2 } and one with grandParent { a:1 }
+
+
+INTERVIEW PROBLEMS
+-------------------
+
+// Problem 1: Nested function calls
+function outer(a) {
+  return function middle(b) {
+    return function inner(c) {
+      console.log(a + b + c);
+    };
+  };
+}
+outer(1)(2)(3); // Output: 6
+
+// Same as:
+let middleFunc = outer(1);   // a = 1, returns middle function
+let innerFunc = middleFunc(2); // b = 2, returns inner function
+innerFunc(3);  // c = 3, a+b+c = 1+2+3 = 6
+
+// inner function accesses a and b through closures even after outer and middle
+// are done executing!
+
+
+// Problem 2: Counter using Closure
+function outer(i) {
+  return function inner() {
+    i++;
+    console.log(i);
+  };
+}
+var increment = outer(0);
+increment(); // 1
+increment(); // 2
+increment(); // 3
+
+// EXPLANATION:
+// inner makes closure with outer, i is stored in closure object
+// Every call to increment increments the SAME i in closure
+// Outer is done executing but inner still remembers i through closure
+
+
+// Problem 3: var vs let/const with closures
+function outer() {
+  var a = 1;
+  // let a = 1;  // same behavior for let
+  // const a = 1; // DIFFERENT - throws error since we reassign
+  return function inner() {
+    var b = 2;
+    console.log(a + b);
+    a = 10; // reassigning 'a' in closure
+  };
+}
+var output = outer();
+output(); // 3 (a=1, b=2, a+b=3, then a becomes 10)
+output(); // 12 (a=10, b=2, a+b=12)
+
+// REMEMBER: closure holds REFERENCE to variable, not a snapshot!
+// If const was used instead: throws 'Assignment to constant variable'
+
+
+// Problem 4: Arrow function closure
+function outer() {
+  var a = 10;
+  let inner = () => {
+    console.log(a);
+  };
+  a = 20;
+  return inner;
+}
+outer()(); // Output: 20
+
+// inner grabs REFERENCE to 'a', not its snapshot.
+// By the time inner runs, a's latest value is 20.
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Creating private variables / encapsulation
+- Counter functions
+- Memoization
+- setTimeout with loop variables
+- Module pattern in JavaScript
+- React hooks (useState) use closures internally
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is a closure?
+A1. A closure is when an inner function can access variables from its outer function even after the outer function has finished executing. The inner function forms a closure with its lexical scope.
+
+Q2. What is the output of outer(1)(2)(3) where outer returns middle(b) which returns inner(c) which logs a+b+c?
+A2. 6. The inner function accesses a and b through closures.
+
+Q3. Create a counter function using closure.
+A3. See Problem 2 above.
+
+Q4. What is the output of the closure problem with var vs const?
+    outer() returns inner() which logs a+b and sets a=10.
+    output() called twice.
+A4. First call: 3, Second call: 12.
+    With const 'a': Error - Assignment to constant variable.
+
+Q5. What is the difference between closure variables with var and let?
+A5. Both var and let can be reassigned in a closure. Const cannot be reassigned.
+    The closure holds a REFERENCE to the variable, not a snapshot.

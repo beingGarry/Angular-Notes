@@ -1,0 +1,110 @@
+================================================================================
+TOPIC 10: POLYFILLS OF CALL, APPLY, AND BIND
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+- A POLYFILL is code logic written to replicate the behavior of a built-in method for browsers that don't support it. When a new function is added to JavaScript and some browsers don't support it, developers write polyfills to support that functionality.
+
+Writing polyfills is also a way to understand how built-in methods work internally.
+
+Prerequisites: Spread Operator, Prototype
+
+
+POLYFILL OF CALL
+-----------------
+Use cases to cover:
+1. Pass second object and change context of THIS keyword
+2. Honor comma-separated arguments
+3. Add null checks for invalid usage
+
+// STEP 1: Add polyfill to Function.prototype
+// By doing this, ALL functions will have myCall available (like how slice is
+// available on all arrays)
+
+Function.prototype.myCall = function myCall(obj, ...args) {
+  if (Object.prototype.toString.call(this) !== "[object Function]") {
+    throw new Error("Unable to call on non function data type");
+  } else {
+    obj.func = this; // 'this' refers to the function on which myCall is called
+    return obj.func(...args);
+  }
+}
+
+// Usage:
+let personOne = {
+  name: 'bruce',
+  getName: function (param1, param2, param3) {
+    return param1 + param2 + param3 + this.name;
+  },
+};
+let personTwo = { name: 'peter' };
+console.log(personOne.getName.myCall(personTwo, "First ", "Name ", "is "));
+// Output: First Name is peter
+
+// HOW IT WORKS:
+// 'this' inside myCall = getName function
+// obj = personTwo
+// We add getName to personTwo: obj.func = this (= getName)
+// Now call it: obj.func(...args) -> this inside getName now refers to personTwo
+
+
+POLYFILL OF APPLY
+------------------
+Apply is same as Call, but accepts arguments as an ARRAY. Extra null check needed
+to ensure second argument is an array.
+
+Function.prototype.myApply = function myApply(obj, args) {
+  if (Object.prototype.toString.call(this) !== "[object Function]") {
+    throw new Error("Unable to call on non function data type");
+  } else if (!Array.isArray(args)) {
+    throw new Error("CreateListFromArrayLike called on non-object");
+  } else {
+    obj.func = this;
+    return obj.func(...args); // spread the array into comma-separated args
+  }
+};
+
+// Usage:
+console.log(personOne.getName.myApply(personTwo, ["First ", "Name ", "is "]));
+// Output: First Name is peter
+
+
+POLYFILL OF BIND
+-----------------
+Bind is like Call but RETURNS A FUNCTION COPY instead of invoking immediately.
+
+Function.prototype.myBind = function myBind(obj, ...args1) {
+  obj.fn = this;
+  return function (...args2) {
+    let arr = [...args1, ...args2]; // merge args from bind and from returned func call
+    return obj.fn(...arr);
+  };
+};
+
+// Usage:
+let returnedFunc = personOne.getName.myBind(personTwo, "Apple.");
+console.log(returnedFunc("JS Dev"));
+// Output: My name is prabh. I work at Apple. My occupation is JS Dev
+
+// The returned function can also accept its own arguments (args2)
+// which are merged with args1 (passed to myBind)
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is a polyfill?
+A1. Code logic written to replicate the behavior of a built-in method,
+    especially for browsers that don't support that method natively.
+
+Q2. Write a polyfill for the call method.
+A2. See myCall above.
+
+Q3. Write a polyfill for the apply method.
+A3. See myApply above.
+
+Q4. Write a polyfill for the bind method.
+A4. See myBind above.
+
+Q5. What is Function.prototype and why do we add polyfills there?
+A5. Function.prototype is the prototype of all functions. Adding a method there makes it available on all function instances, just like Array.prototype.slice is available on all arrays.

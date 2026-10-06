@@ -1,0 +1,227 @@
+Performance Improvements in Angular Production
+1. Lazy Loading
+
+Load modules only when needed.
+
+Before:
+
+whole app loads initially
+bigger bundle
+slow startup
+
+After:
+
+only required module loads
+
+Example:
+
+{
+  path: 'admin',
+  loadChildren: () =>
+    import('./admin/admin.module')
+      .then(m => m.AdminModule)
+}
+
+Benefits:
+
+faster initial load
+reduced bundle size
+
+2. OnPush Change Detection
+
+Default Angular checks entire component tree frequently. Using OnPush reduces unnecessary checks.
+
+changeDetection: ChangeDetectionStrategy.OnPush
+- Benefits: fewer re-renders, better UI performance
+- Especially useful:large tables, dashboards, lists
+
+3. trackBy in *ngFor
+
+Without trackBy, Angular re-renders entire list. With trackBy, only changed items update.
+
+<li *ngFor="let item of items; trackBy: trackById">
+trackById(index: number, item: any) {
+  return item.id;
+}
+
+Benefits: less DOM manipulation, smoother UI
+
+4. API Call Optimization
+Avoid unnecessary API calls => Use: debounceTime, switchMap, caching
+
+Example:
+search.pipe(
+  debounceTime(300),
+  switchMap(value => this.api.search(value))
+)
+Benefits: 'fewer API calls', 'reduced server load'
+
+5. Caching
+
+Store repeated API responses.
+Example: dropdown master data, user profile, static configs
+
+Can use: RxJS shareReplay, sessionStorage, state management, shareReplay(1)
+
+Benefits:avoids repeated API hits, faster response
+
+6. Image Optimization
+
+Use: compressed images, lazy loading images, WebP format
+<img loading="lazy">
+
+Benefits:'faster page load'
+
+7. Remove Unused Libraries
+
+Large libraries increase bundle size.
+
+Instead of whole lodash:
+
+Bad:
+
+import _ from 'lodash';
+
+Good:
+
+import debounce from 'lodash/debounce';
+
+Benefits:
+
+smaller bundle
+
+8. Production Build
+
+Use production build:
+
+ng build --configuration production
+
+Production build does:
+
+minification
+tree shaking
+optimization
+dead code removal
+
+9. Tree Shaking
+
+Unused code removed automatically during build.
+
+Benefits:
+reduced bundle size
+faster loading
+
+10. Code Splitting
+
+Split large bundles into chunks.
+
+Angular does this with lazy loading.
+
+Benefits: load only needed code
+
+11. Virtual Scrolling
+
+For huge lists: Instead of rendering 10,000 rows, render only visible rows.
+
+Using Angular CDK:
+
+<cdk-virtual-scroll-viewport>
+
+Benefits: massive rendering improvement
+
+12. Avoid Memory Leaks
+
+Unsubscribe observables.
+ngOnDestroy() {
+  this.subscription.unsubscribe();
+}
+Or use: takeUntil()
+Benefits: avoids performance degradation
+
+13. Use Pure Pipes
+
+Pure pipes run only when input changes.
+
+Benefits:
+
+fewer recalculations
+
+14. Server-side Pagination
+
+Instead of loading all data:
+
+Use:
+
+pagination
+infinite scroll
+
+Benefits:
+
+less memory usage
+faster rendering
+
+15. Preloading Strategy
+
+After app load, preload lazy modules in background.
+
+PreloadAllModules
+
+Benefits:
+
+smoother navigation
+16. Reduce Change Detection Calls
+
+Avoid calling functions directly in HTML.
+
+Bad:
+
+{{ getData() }}
+
+Because function executes repeatedly.
+
+Better:
+
+use variables
+async pipe
+
+
+17. SSR (Server Side Rendering)
+
+Using Angular SSR.
+
+Benefits:
+
+faster first paint
+better SEO
+Real Project Interview Answer
+
+“In production, I improved performance using lazy loading, OnPush change detection, trackBy in ngFor, API debouncing, caching, and optimized production builds. We also reduced unnecessary API calls, optimized images, implemented virtual scrolling for large tables, and used lazy-loaded modules to reduce initial bundle size.”
+
+Advanced Interview Points
+
+* How to Analyze Performance?
+
+Using:
+
+Chrome DevTools
+Lighthouse
+Angular DevTools
+
+Check:
+
+bundle size
+rendering time
+API timing
+memory leaks
+
+* Important Production Terms
+
+- Term	                               Meaning
+Lazy Loading	                       Load modules on demand
+Tree Shaking	                       Remove unused code
+Minification	                       Reduce JS size
+Caching	                             Store reusable data
+Debouncing	                         Delay rapid events
+Virtual Scroll	                     Render visible items only
+OnPush	                             Reduce change detection
+Code Splitting	                     Divide bundlesl,l

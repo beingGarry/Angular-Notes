@@ -1,0 +1,213 @@
+================================================================================
+TOPIC 1: SHALLOW VS DEEP COPY
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+Topics under this:
+1. Assignment by reference
+2. Assignment by value
+3. Primitive data types
+4. Composite data types
+5. Spread Operator
+6. Object.assign()
+7. Shallow Copy
+8. Nested Objects/Nested Arrays
+9. JSON.parse and JSON.stringify
+10. JSON limitations (functions/dates)
+11. Third-party library help for deep copy (lodash)
+12. Recursion for deep copy
+
+1. Assignment by Reference ---
+For NON-PRIMITIVE data types in Javascript, like Arrays and Objects, both of them are assigned to a variable by REFERENCE. In other words, "they are assigned by memory, not by value".
+
+Whenever an Object is assigned to a variable, both the new Object and the old Object share the SAME MEMORY. If there is a change in the property of a new Object, that change will be reflected in the old Object as well.
+
+2. Assignment by Value ---
+For primitive data types like numbers, strings, booleans, undefined and null, whenever a primitive data type is assigned to the same primitive data type, it is assigned by VALUE, not by reference. So changing one does NOT affect the other. 
+
+BOTTOMLINE:
+- Non-primitive values (arrays, objects) -> assigned by REFERENCE
+- Primitive values (numbers, strings, booleans, undefined, null) -> assigned by VALUE
+
+
+EXAMPLES
+---------
+
+// Assignment by Reference - OBJECTS
+let personOne = { name: 'Prabh', occupation: 'front end dev' };
+let personTwo = personOne;
+
+console.log(personOne); // { name: 'Prabh', occupation: 'front end dev' }
+personTwo.name = 'Gurpreet';
+console.log(personOne); // { name: 'Gurpreet', occupation: 'front end dev' }
+console.log(personTwo); // { name: 'Gurpreet', occupation: 'front end dev' }
+
+// Assignment by Reference - ARRAYS
+const array1 = [1, 2, 3];
+const array2 = array1;  // passing by reference
+array2[2] = 4;
+console.log(array1); // [1, 2, 4]
+console.log(array2); // [1, 2, 4]
+
+// Assignment by Value - BOOLEANS
+var a = true;
+var b = a;
+console.log(a, b); // true, true
+b = false;
+console.log(a, b); // true, false  <-- a is NOT changed
+
+// Same behavior for NUMBERS, STRINGS, UNDEFINED, NULL
+
+
+- FIX: Spread Operator and Object.assign() for shallow copy
+-----------------------------------------------------------
+
+// Spread Operator for Objects
+var personOne = { firstName: 'Prabh', occupation: 'front end dev' };
+* var personTwo = { ...personOne };
+
+personTwo.firstName = 'Gurpreet';
+console.log(personOne); // { firstName: "Prabh", occupation: 'front end dev' }
+console.log(personTwo); // { firstName: "Gurpreet", occupation: 'front end dev' }
+
+// Object.assign()
+var personOne = { firstName: 'Prabh', occupation: 'front end dev' };
+* var personTwo = Object.assign({}, personOne);
+
+personTwo.firstName = 'Gurpreet';
+console.log(personOne); // { firstName: "Prabh", ... }
+console.log(personTwo); // { firstName: "Gurpreet", ... }
+
+// Spread Operator for Arrays
+var arrayOne = [1, 2, 3];
+ vrraytwo[2] = 4;
+
+* var arraytwo = [...arrayOne];
+aconsole.log(arrayOne); // [1, 2, 3]
+console.log(arraytwo); // [1, 2, 4]
+
+- NOTE: Slice, Map, Filter, Reduce, Concat can also make copies of arrays.
+
+
+THE NESTED PROBLEM (Shallow vs Deep Copy)
+------------------------------------------
+
+// Nested Object with Spread Operator -- THE ISSUE
+
+var personOne = {
+  firstName: 'Prabh',
+  info: { city: 'Fresno', state: 'California' },
+};
+var personTwo = { ...personOne };
+
+personTwo.firstName = 'Gurpreet';  // does NOT affect personOne
+personTwo.info.city = 'Sunnyvale'; // DOES affect personOne!
+
+console.log(personOne); // { firstName: "Prabh", info: { city: 'Sunnyvale', ... } }
+console.log(personTwo); // { firstName: "Gurpreet", info: { city: 'Sunnyvale', ... } }
+
+SAME ISSUE WITH Object.assign() on nested objects.
+
+WHY?
+- Spread operator and Object.assign() create a DEEP COPY at the TOP LEVEL only.
+- At NESTED LEVELS they still do a SHALLOW COPY (assignment by reference).
+
+
+* SHALLOW COPY DEFINITION:
+When an object/array is assigned to another object/array, not only the value is copied but the memory location is also copied. Both the original and copied object/array share the same memory space. So any change in the copy is also reflected in the original. 
+- Spread Operator and Object.assign() create a deep copy at the top level but a shallow copy at nested levels.
+
+* DEEP COPY DEFINITION:
+All the values are copied and the memory location for both the original and copied variables are separately allocated. So change at any level in one does NOT affect the other at any level.
+
+
+JSON METHOD FIX FOR NESTED OBJECTS
+------------------------------------
+
+var personOne = {
+  firstName: 'Prabh',
+  info: { city: 'Fresno', state: 'California' },
+};
+
+var personTwo = JSON.parse(JSON.stringify(personOne));
+
+personTwo.firstName = 'Gurpreet';
+personTwo.info.city = 'Sunnyvale';
+
+console.log(personOne); // { firstName: "Prabh", info: { city: 'Fresno', ... } } -- NOT affected!
+console.log(personTwo); // { firstName: "Gurpreet", info: { city: 'Sunnyvale', ... } }
+
+EXPLANATION:
+- JSON.stringify converts the object into a string.
+- JSON.parse() parses the stringified object and converts it into the original object but as a COPY. This is treated as a deep copy at all levels.
+
+
+JSON LIMITATIONS
+-----------------
+
+If there are METHODS or DATES inside the object, JSON.parse(JSON.stringify) will make FUNCTIONS DISAPPEAR from properties and dates will stop behaving like dates.
+
+let personOne = {
+  name: 'prabhjot',
+  getName: () => { console.log('prabh'); },
+};
+
+console.log(JSON.parse(JSON.stringify(personOne))); 
+// { name: 'prabhjot' }  # getName function DISAPPEARED!
+
+- REASON: JSON only supports data types like numbers, strings, objects, arrays, undefined and null.
+
+
+FINAL SOLUTION: Use third-party library LODASH - "_cloneDeep"
+------------------------------------------------------------
+lodash's _cloneDeep will create deep copies no matter what kind of nested level data you feed it. It handles functions, dates, etc.
+
+
+DEEP COPY BY RECURSION (Interview Coding Question)
+----------------------------------------------------
+const deepCopyByRecursion = (array) => {
+  let result = [];
+  for (let i = 0; i < array.length; i++) {
+    if (Array.isArray(array[i])) {
+      result.push(deepCopyByRecursion(array[i]));
+    } else {
+      result.push(array[i]);
+    }
+  }
+  return result;
+};
+
+console.log(deepCopyByRecursion([1, 2, [3, 4, [5, 6]]]));
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. Explain deep and shallow copy.
+A1. Shallow copy copies object references, so nested objects are still shared.
+    Deep copy creates fully independent copies at all levels.
+
+Q2. What are primitive and non-primitive data types?
+A2. Primitives: numbers, strings, booleans, undefined, null - assigned by value.
+    Non-primitives: arrays, objects - assigned by reference.
+
+Q3. How do you create a shallow copy and deep copy?
+A3. Shallow: spread operator {...obj} or Object.assign({}, obj)
+    Deep: JSON.parse(JSON.stringify(obj)) for simple cases,
+          or lodash _cloneDeep for all cases.
+
+Q4. How do you handle nested arrays or objects for creating deep copies?
+A4. Use JSON.parse(JSON.stringify()) for objects without functions/dates.
+    Use lodash _cloneDeep for objects with functions/dates.
+    Or write a recursive function.
+
+Q5. Why is JSON not reliable for making deep copies?
+A5. JSON.stringify doesn't support functions, dates, undefined, RegExp, etc.
+    Functions are lost and dates stop behaving as Date objects.
+
+Q6. What should be the final solution for making deep copies?
+A6. Use lodash's _cloneDeep method.
+
+
+
+

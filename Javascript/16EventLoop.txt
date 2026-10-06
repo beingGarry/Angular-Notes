@@ -1,0 +1,221 @@
+================================================================================
+TOPIC 6: EVENT LOOP (Bonus Topic - How JS handles Async under the hood)
+================================================================================
+
+
+
+DEFINITION & EXPLANATION
+--------------------------
+- In Java script, event loop is reposible for managing the execution of code, collecting and processing events and executing qued tasks. 
+- Js operates in single threaded environment, meaning only one piece of code runs at a time. 
+- The event loop ensures that tasks are executed in the correct order, enabling asynchronous programming.
+
+
+1. Call Stack
+2. Web APIs (Browser APIs) Environment
+3. Callback Queue (Macrotask Queue / Task Queue)
+4. Microtask Queue (Promise Queue)
+5. Event Loop itself
+
+
+HOW EACH PIECE WORKS
+---------------------
+
+1. CALL STACK:
+Where all JavaScript code executes. Call stack keep track of which function is currently running. 
+
+-> When function is called — it goes into stack
+-> When the function finishes — it removes from the stacked.
+  
+  - Single-threaded=> LIFO => GEC sits at the bottom => Functions pushed/popped as called/completed.
+
+2. WEB APIS ENVIRONMENT:
+   The BROWSER provides extra features that JS itself does not have:
+   - setTimeout / setInterval
+   - fetch (HTTP requests)
+   - DOM event listeners (click, scroll, etc.)
+   - Geolocation API
+   When JS code calls setTimeout or fetch, the operation goes to Web APIs.
+   - Web APIs handle the waiting/delay OUTSIDE the call stack.
+   JS does NOT wait — it moves on to the next line immediately.
+
+3. CALLBACK QUEUE (Macrotask Queue):
+   When the Web API timer/event finishes, the callback function is pushed into the Callback Queue. It WAITS here until the call stack is EMPTY.
+   Examples: setTimeout callbacks, setInterval callbacks, DOM event callbacks.
+
+4. MICROTASK QUEUE:
+   A SEPARATE, HIGHER-PRIORITY queue specifically for:
+   - Promise .then() and .catch() callbacks
+   - async/await continuations (code after await)
+   - MutationObserver callbacks
+   Microtask Queue has HIGHER PRIORITY than Callback Queue.
+   ALL microtasks are processed BEFORE any macrotask.
+
+5. EVENT LOOP:
+
+The event loop continuously checks:
+- Is call stack empty ?
+- If yes, first execute all microtask , Then execute all task from task queue.
+
+It manages execution order.
+
+   The Event Loop's job:
+   Step 1: Wait for the Call Stack to be empty.
+   Step 2: Check Microtask Queue FIRST. If tasks present -> push to Call Stack.
+   Step 3: Keep clearing ALL microtasks until Microtask Queue is empty.
+   Step 4: Then check Callback Queue. Push ONE task to Call Stack.
+   Step 5: Go back to Step 1. Repeat forever.
+
+PRIORITY ORDER:
+1. Synchronous code (Call Stack) -> RUNS FIRST, ALWAYS
+2. Microtask Queue (Promises/.then/await) -> AFTER current sync code
+3. Callback Queue (setTimeout/events) -> LAST, after microtasks are empty
+
+
+EXAMPLES
+---------
+
+// EXAMPLE 1: Basic setTimeout
+console.log("Start");
+setTimeout(() => { console.log("setTimeout"); }, 0);
+console.log("End");
+
+OUTPUT: Start -> End -> setTimeout
+
+FLOW STEP BY STEP:
+1. "Start" pushed to call stack, executes, popped.
+2. setTimeout() called -> registered in Web APIs with 0ms timer.
+   setTimeout itself is done in call stack, but callback is in Web APIs.
+3. "End" pushed to call stack, executes, popped.
+4. Timer expires (0ms) -> callback moved to CALLBACK QUEUE.
+5. Call Stack is now EMPTY.
+6. Event Loop: empty call stack -> check Microtask Queue (empty) ->
+   check Callback Queue -> push setTimeout callback to call stack.
+7. "setTimeout" logs.
+
+
+// EXAMPLE 2: Promise vs setTimeout (Priority)
+console.log("Start");
+setTimeout(() => { console.log("setTimeout"); }, 0);
+Promise.resolve().then(() => { console.log("Promise"); });
+console.log("End");
+
+OUTPUT: Start -> End -> Promise -> setTimeout
+
+FLOW:
+1. "Start" logs (sync).
+2. setTimeout registered in Web APIs.
+3. Promise.resolve() is already resolved -> .then() callback goes to
+   MICROTASK QUEUE immediately.
+4. "End" logs (sync).
+5. Call Stack EMPTY. Event Loop checks MICROTASK QUEUE first.
+6. "Promise" logs (from microtask queue - higher priority).
+7. Microtask Queue empty. Event Loop checks CALLBACK QUEUE.
+8. "setTimeout" logs.
+
+KEY POINT: Promises (Microtasks) ALWAYS execute before setTimeout (Macrotasks)
+           even if setTimeout has 0ms delay.
+
+
+// EXAMPLE 3: Multiple Promises and setTimeout
+console.log("1");
+setTimeout(() => { console.log("2"); }, 0);
+Promise.resolve().then(() => { console.log("3"); });
+Promise.resolve().then(() => { console.log("4"); });
+console.log("5");
+
+OUTPUT: 1 -> 5 -> 3 -> 4 -> 2
+
+FLOW:
+1. "1" logs (sync).
+2. setTimeout -> Web APIs -> Callback Queue.
+3. Promise "3" -> Microtask Queue.
+4. Promise "4" -> Microtask Queue.
+5. "5" logs (sync).
+6. Call Stack empty -> Microtask Queue has 2 tasks.
+7. "3" logs, "4" logs (ALL microtasks cleared).
+8. Event Loop -> Callback Queue -> "2" logs.
+
+
+// EXAMPLE 4: async/await + Event Loop
+console.log("1");
+async function myAsync() {
+  console.log("2");          // before await - SYNC
+  await Promise.resolve();
+  console.log("3");          // after await - goes to MICROTASK QUEUE
+}
+myAsync();
+console.log("4");
+
+OUTPUT: 1 -> 2 -> 4 -> 3
+
+FLOW:
+1. "1" logs (sync).
+2. myAsync() called -> "2" logs (sync, before await keyword).
+3. await encountered -> myAsync() LEAVES call stack.
+   Continuation (logging "3") is scheduled in MICROTASK QUEUE.
+4. "4" logs (sync, outside async function).
+5. Call Stack empty -> Microtask Queue -> "3" logs.
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Why setTimeout(fn, 0) doesn't run immediately (call stack must be empty first).
+- Why Promises run before setTimeout (Microtask Queue has higher priority).
+- Why UI doesn't freeze during fetch requests (Web APIs handle them outside
+  the call stack, Event Loop brings result back when ready).
+- How Angular's zone.js and change detection integrate with async operations
+  without blocking the UI.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the Event Loop?
+A1. A mechanism that continuously checks the call stack and task queues. When
+    the call stack is empty, it moves tasks from the queues into the call stack
+    for execution. It enables non-blocking async behavior in JavaScript.
+
+Q2. What is the difference between Microtask Queue and Callback Queue?
+A2. Microtask Queue: holds Promise .then/.catch callbacks and async/await
+    continuations. HIGHER PRIORITY - processed BEFORE Callback Queue.
+    Callback Queue (Macrotask Queue): holds setTimeout, setInterval, and DOM
+    event callbacks. LOWER PRIORITY - processed AFTER Microtask Queue is empty.
+
+Q3. What is the priority order of execution in JavaScript?
+A3. 1) Synchronous code (Call Stack) - always first.
+    2) Microtask Queue (all pending microtasks are cleared completely).
+    3) ONE task from Callback Queue. Then back to step 2.
+
+Q4. Why does setTimeout(fn, 0) not execute immediately?
+A4. Even with 0ms delay, the callback goes through Web APIs -> Callback Queue.
+    It can only enter the call stack when the call stack is empty AND all
+    microtasks are done. So synchronous code and promises always run first.
+
+Q5. What is the output?
+    console.log('1');
+    setTimeout(() => console.log('2'), 0);
+    Promise.resolve().then(() => console.log('3'));
+    console.log('4');
+A5. 1 -> 4 -> 3 -> 2
+    Sync: 1, 4. Then microtask (Promise): 3. Then macrotask (setTimeout): 2.
+
+Q6. What are Web APIs?
+A6. Features provided by the BROWSER (not JS itself) such as setTimeout,
+    setInterval, fetch, DOM events, Geolocation. They run OUTSIDE the call
+    stack, allowing JS to handle async operations without blocking.
+
+Q7. Can the Call Stack and Web APIs run at the same time?
+A7. YES. While JS executes synchronous code in the call stack, the browser
+    can simultaneously handle timers and network requests in Web APIs. This is
+    how JS achieves concurrency despite being single-threaded.
+
+Q8. What is "starvation of the macrotask queue"?
+A8. If microtasks keep generating more microtasks endlessly, the callback
+    (macrotask) queue never gets processed. The Event Loop keeps clearing
+    microtasks and never reaches setTimeout callbacks.
+
+
+================================================================================
+QUICK REFERENCE CHEAT SHEET
+================================================================================
+

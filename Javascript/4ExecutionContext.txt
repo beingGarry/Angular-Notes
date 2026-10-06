@@ -1,0 +1,119 @@
+================================================================================
+TOPIC 4: EXECUTION CONTEXT
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+If you are curious to know how a JavaScript program runs under the hood, in a single phrase, GLOBAL EXECUTION CONTEXT is the answer.
+
+Whenever a JavaScript program is run, the Global Execution Context is created in TWO PHASES:
+1. Memory Allocation (Memory Creation Phase)
+2. Code Execution Phase
+
+MEMORY ALLOCATION (Memory Creation):
+- Variables and functions are DEFINED/DECLARED and stored in memory.
+- No values are assigned yet. Variables get 'undefined' as their value.
+- Functions get their entire definition stored.
+- No function calls are made in this phase.
+
+CODE EXECUTION:
+- Values are assigned to variables.
+- Functions that are declared in the Memory phase are invoked.
+
+IMPORTANT POINT:
+In the Code Execution phase, whenever a function is CALLED, a NEW EXECUTION CONTEXT is created for that function INSIDE the Global Execution Context.
+
+This new execution context is also created in two phases:
+Memory Allocation and Code Execution.
+
+
+EXAMPLES
+---------
+
+--- Example 1 ---
+var x = 1;
+function foo() { console.log(1); }
+foo();
+
+MEMORY PHASE:
+- x -> undefined (stored)
+- foo -> [entire function definition] (stored)
+
+CODE EXECUTION PHASE:
+- x = 1 (value assigned)
+- foo() called -> NEW EXECUTION CONTEXT created for foo
+  - Memory Phase of foo: nothing to store
+  - Code Execution of foo: console.log(1) -> logs 1
+  - foo execution done -> foo's execution context DELETED
+- GEC done -> GEC DELETED
+
+
+--- Example 2 ---
+var x = 1;
+function foo() {
+  var a = 1;
+  console.log(a);
+}
+foo();
+
+GLOBAL EXECUTION CONTEXT:
+Memory Phase: x = undefined, foo = [function definition]
+Code Execution: x = 1, foo() called -> NEW EXECUTION CONTEXT for foo
+
+  EXECUTION CONTEXT OF FOO:
+  Memory Phase: a = undefined
+  Code Execution: a = 1, console.log(a) -> logs 1 (or 2 per original text)
+  foo done -> foo's execution context DELETED
+
+GEC done -> GEC DELETED
+
+
+--- Example 3 (Nested) ---
+var x = 1;
+function foo() {
+  var a = 1;
+  console.log(a);
+  function bar() {
+    var b = 1;
+    console.log(b);
+  }
+  bar()
+}
+foo();
+
+GLOBAL EC:
+Memory Phase: x, foo stored
+Code Execution: x=1, foo() called -> EC for foo created
+
+  EC OF FOO:
+  Memory Phase: a, bar stored
+  Code Execution: a=1, a logged, bar() called -> EC for bar created
+
+    EC OF BAR:
+    Memory Phase: b stored
+    Code Execution: b=1, b logged
+    bar done -> bar's EC DELETED
+
+  foo done -> foo's EC DELETED
+GEC done -> DELETED
+
+NOTE: All execution contexts run inside a CALL STACK.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the Global Execution Context?
+A1. It is the context in which JavaScript code executes. Created in two phases:
+    Memory Allocation Phase and Code Execution Phase.
+
+Q2. What are the two phases of the Execution Context?
+A2. 1) Memory Creation/Allocation Phase: Variables and functions are stored. Variables get 'undefined', functions get their full definition.
+    2) Code Execution Phase: Values are assigned to variables, functions called.
+
+Q3. What happens when a function is invoked?
+A3. A NEW Execution Context is created for that function, inside the current
+    execution context. It also goes through the same two phases.
+
+Q4. What is the value of a variable in the Memory Phase?
+A4. Variables get 'undefined' in the Memory Phase.
+    Functions get their complete definition (from { to }).

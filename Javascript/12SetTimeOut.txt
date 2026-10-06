@@ -1,0 +1,155 @@
+================================================================================
+TOPIC 12: SETTIMEOUT
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+JavaScript is SINGLE-THREADED and SYNCHRONOUS. So how is async behavior achieved?
+Through Browser APIs like setTimeout.
+
+* SETTIMEOUT is a function property on the window object (available globally). It enables us to run code AFTER a certain time interval.
+
+SYNTAX:
+setTimeout(callbackFunc, time, arg1, arg2, ...argsN)
+- First argument: callback function (REQUIRED) - the logic to execute
+- Second argument: delay time in milliseconds (optional, default 0)
+- Third and onwards: parameters for the callback function (optional)
+
+NOTE: setTimeout expects a FUNCTION DEFINITION, not a function call.
+// WRONG: setTimeout(greet(), 2000) -- passes result of calling greet, not the function
+// RIGHT: setTimeout(greet, 2000)   -- passes function definition
+
+
+CLEAR TIMEOUT
+--------------
+setTimeout returns a unique timer identifier. Use clearTimeout to cancel it.
+
+let timerId = setTimeout(() => { console.log("1"); }, 2000);
+clearTimeout(timerId); // cancels the setTimeout
+
+
+SETTIMEOUT ISSUE
+-----------------
+setTimeout can take MORE time than specified. It will NEVER execute BEFORE the specified time, but it CAN execute AFTER if the call stack is busy. The callback has to WAIT for the call stack to be EMPTY before executing.
+
+
+EXAMPLES
+---------
+
+// Various ways to write setTimeout
+setTimeout(function greet() { console.log("hi"); }, 2000);
+setTimeout(function () { console.log("hi"); }, 2000);
+setTimeout(() => { console.log("hi"); }, 2000);
+var greet = function () { console.log("hi"); };
+setTimeout(greet, 2000);
+
+// With third argument (params for callback)
+setTimeout(function (message) { console.log(message); }, 2000, 'hi');
+
+
+INTERVIEW PROBLEMS
+-------------------
+
+// Problem 1: setTimeout with 0 delay
+setTimeout(() => { console.log('Yes, you are.') }, 0)
+console.log('I am surprised.')
+
+OUTPUT: 'I am surprised.' then 'Yes, you are.'
+
+EXPLANATION:
+1. setTimeout is registered in the Browser API environment
+2. Even with 0 delay, the callback waits for the call stack to be EMPTY
+3. The synchronous console.log executes first in the call stack
+4. Then setTimeout callback moves to the call stack and executes
+
+
+// Problem 2: setTimeout with no delay specified
+setTimeout(() => { console.log('Yes, you are.') })
+console.log('I am surprised again.')
+OUTPUT: 'I am surprised again.' then 'Yes, you are.'
+Same behavior - second param is optional, still goes through Browser API.
+
+
+// Problem 3: Two setTimeouts with same delay
+setTimeout(() => { console.log('After 2 seconds') }, 2000)
+setTimeout(() => { console.log('Am I After 2 seconds or 4?') }, 2000)
+OUTPUT: Both log after 2 seconds (not sequentially waiting 2+2)
+Both are registered at the same time in Browser API env.
+
+
+// Problem 4: Classic var + for loop + setTimeout BUG
+for (var i = 0; i < 3; i++) {
+  setTimeout(() => { console.log(i); }, i * 1000);
+}
+OUTPUT: 3, 3, 3 (after 0, 1, 2 seconds respectively) -- NOT 0, 1, 2!
+
+WHY?
+- var does NOT have block scope
+- All setTimeouts share the SAME variable i
+- By the time setTimeouts execute, i has already become 3 (loop ended)
+
+FIX 1: Use let instead of var
+for (let i = 0; i < 3; i++) {
+  setTimeout(() => { console.log(i); }, i * 1000);
+}
+OUTPUT: 0 (after 0s), 1 (after 1s), 2 (after 2s)
+WHY? let creates a new block-scoped variable i for EACH iteration.
+Each setTimeout has its own unique reference to i.
+
+FIX 2: Use Closure (without changing var to let)
+for (var i = 0; i < 3; i++) {
+  function printCount(x) {
+    setTimeout(() => { console.log(x); }, x * 1000);
+  }
+  printCount(i); // creates new reference 'x' in each iteration via closure
+}
+OUTPUT: 0, 1, 2
+
+
+// Problem 6: setTimeout vs long synchronous task
+setTimeout(() => { console.log('setTimeout '); }, 1000);
+let startTime = new Date().getTime();
+for(let i = startTime; i < startTime + 20000; i++){
+  console.log('for loop')
+}
+OUTPUT: for loop (20000 times), then setTimeout
+
+EXPLANATION:
+- setTimeout registers for 1 second, but for loop takes much more than 1 second
+- Call stack is busy with for loop
+- setTimeout callback WAITS for call stack to be empty
+- Only after for loop finishes, setTimeout gets to execute
+- Hence, setTimeout fires MUCH later than 1 second
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Debouncing user input
+- Showing notifications after a delay
+- Polling (check something every N seconds)
+- Delaying API calls
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is setTimeout?
+A1. A window method that executes a callback function after a specified delay
+    in milliseconds. It does not block the main thread.
+
+Q2. What is the output of setTimeout(fn, 0)?
+A2. The callback still runs AFTER synchronous code completes, because even
+    with 0ms delay, it goes through the Browser API and waits for the call
+    stack to be empty.
+
+Q3. Classic: What does this print?
+    for (var i = 0; i < 3; i++) { setTimeout(() => console.log(i), i * 1000); }
+A3. 3, 3, 3. Because var is not block-scoped, all setTimeouts share the same
+    variable i which becomes 3 after the loop.
+
+Q4. Fix the above problem without changing var to let.
+A4. Wrap setTimeout in a function and pass i as argument to create a new
+    reference via closure (see Fix 2 above).
+
+Q5. Can setTimeout guarantee exact timing?
+A5. No. setTimeout guarantees a MINIMUM delay. The actual execution time can
+    be more if the call stack is busy with synchronous code.
+

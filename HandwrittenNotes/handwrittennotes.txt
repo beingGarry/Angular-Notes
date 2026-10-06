@@ -1,0 +1,1147 @@
+
+Page 2 — 
+
+
+
+
+
+
+Page 26 Page 28 — 
+Page 30 
+Page 34
+Page 39 — 
+Page 45 — Promises in Angular
+
+Promises In angular.
+
+A promise in angular is a JS object which produces value after an async operation is executed successfully.
+
+If the operation does not execute successfully, then it generate an error.
+
+A promise in angular is a class-based object, it is created using new keyword and its constructor function.
+
+It is defined by passing a callback function also known as the executor function as an argument to the promise constructor.
+
+The executor function usually takes two argument (Resolve, and reject).
+
+Const myPromis = new Promise((resolve, reject) => {
+
+ setTimeout(() => {
+
+   resolve("this is a promise");
+
+ }, 300)
+})
+myPromis.then((value) => {
+ console.log(value);
+})
+
+// expected output : "this is promise"
+
+Page 46 — Promise States / then()
+
+Promise object have a then() and catch() methods which handles fulfilled result and error if occurs.
+
+They receive the outcome of async operation as data or error from the resolve and reject handlers in the promise constructor.
+
+Promise has three state
+
+Pending :
+
+This is an initial state, which is neither fulfilled nor rejected.
+
+fulfilled :
+
+operation is completed successfully
+
+Rejected :
+
+This means operation has failed.
+
+A promise in Angular is said to be settled if it is either fulfilled or rejected.
+It can not be in pending state.
+.then()
+Runs immediately after the promise has been fulfilled or rejected or after resolved is called.
+then takes the callback function which receives the result when resolve is called. i.e then(function).
+The callback function then takes result as an argument
+Result is the value that we passed on to resolve as an argument when calling it. i.e Resolve(value)
+Page 47 — catch() / finally()
+
+.Catch
+catch run immediately after reject (error) executed by the executer. That is after the promise has been rejected.
+.Finally
+The finally handler runs after the promise is settled. settled means that the promise is either fulfilled or rejected.
+whether the promise was fulfilled or rejected.
+finally is always going to run.
+It does not process a promise but rather finalizes everything after the previous operation have been completed.
+Promise = new Promise((resolve, reject) => {
+
+ setTimeout(() => {
+
+   let count = 5
+
+   if(count === 5) {
+     resolve("done")
+   } else {
+     reject(new Error("oops something went wrong"))
+   }
+
+ },2000)
+
+})
+Promise.then((result) => {
+ console.log(result)
+})
+.catch((error) => {
+ console.log(error)
+})
+.finally(() => {
+ console.log("everything is finalized")
+})
+Page 48 — Difference Between Promise and Observable
+
+Diff bet’n Promise and Observables.
+Promises
+Suitable for single asynchronous operation like fetching data from API
+Handles error through .catch() method.
+Promise can not be cancelled once initiated.
+.then(), .catch(), .finally().
+Observables
+ideal for handling stream of data, such as user input, HTTP response where multiple values might be emitted over time.
+Use the error callback in the subscribe method to handle errors.
+Can be unsubscribed, cancelling the ongoing operation.
+Next(), error(), complete().
+Page 49 — Subjects in Angular
+
+Subjects in Angular:
+
+Subjects are a special type of observables in angular’s RxJS library that allows you to multicast values to multiple observers.
+
+Unlike regular observables, subjects are both an observable and an observer, meaning they can emit values and also be subscribed to.
+
+Subject :
+
+A basic subject can emit values to multiple subscribers.
+
+Emit values to all subscribers
+Does not hold onto values, new subscriber will not receive previous values.
+import { Subject } from 'rxjs';
+
+const subject = new Subject<number>();
+
+subject.subscribe(value => console.log('subscriber1', value))
+
+subject.next(1);
+subject.next(2);
+
+subject.subscribe(value => {
+ console.log('sub2', value)
+})
+
+subject.next(3);
+
+O/P →
+
+sub1 : 1
+sub1 : 2
+sub1 : 3
+sub2 : 3
+
+Page 50 — BehaviorSubject / ReplaySubject
+
+Behaviours Subject.
+Store the latest value emitted and emits it to new subscriber immediately.
+Hold the latest value and emits it to new subscriber immediately.
+const behaviorSub = new BehaviorSubject<number>(0);
+
+behaviorSub.subscribe(value => console.log('sub1', value))
+
+behaviorSub.next(1);
+
+behaviorSub.subscribe(value2 => console.log('sub2', value2))
+
+behaviorSub.next(2);
+
+O/P →
+
+sub1 : 0
+sub1 : 1
+sub2 : 1
+sub1 : 2
+sub2 : 2
+
+ReplaySubject :
+
+Stored a specified number of previous values and emits them to new subscribers.
+
+Replays a specified number of previous value to new subscribers.
+
+Page 51 — AsyncSubject / Unsubscribing Service
+
+Async Subject :
+
+Emits the last value to subscriber once the observable completes.
+
+const asyncSub = new AsyncSubject<number>();
+
+constructor() {
+
+ asyncSub.subscribe((value1) => {
+   console.log('sub1', value1)
+ })
+
+ asyncSub.next(1)
+ asyncSub.next(2)
+ asyncSub.next(3)
+
+ asyncSub.complete()
+
+ asyncSub.subscribe((value2) => {
+   console.log('sub2', value2)
+ })
+}
+
+O/P →
+
+sub1 : 3
+sub2 : 3
+
+Unsubing service
+onDestroy : Subject<void> = new Subject();
+
+ngOnInit() {
+
+ this.service.behaviourSubject.pipe(
+   takeUntil(this.onDestroy)
+ ).subscribe((value) => {
+   this.value = value
+ })
+}
+
+ngOnDestroy() {
+ this.onDestroy.next();
+ this.onDestroy.complete();
+}
+Page 52 — Ways to Share Data Between Angular Components
+
+5 way to share data bet’n Angular component.
+Parent to child component :
+
+When you define @Input() in the child component it will receive value from the master or parent component.
+
+Create a property in the child component and decorate with @Input(). This will mark the property as input property.
+
+export class childComponent {
+
+ @Input() some_property : number;
+}
+
+And in the parent component instantiate the child component. Pass the value to the some property using the property Bind Syntax.
+
+<child-component [someProperty]="value"></child-component>
+
+In this way, child component will receive the data from the parent.
+
+child to parent component :
+
+For sharing data from child to parent we need O/P decorate.
+
+Using output() decorator and Event Emitter we can transfer the data from the child to parent component.
+
+Page 53 — Child to Parent Using @Output
+
+steps
+import output() and EventEmitter from angular/core in child component
+In child component define a value with @output() and assign it with the new EventEmitter constructor.
+Create button event in same component.
+Now, the parent component defines a child selector and binds an event property with the same name to defined @output value in child component.
+
+e.g.
+
+export class childComponent {
+
+ @Output()
+ childEvent = new EventEmitter();
+
+ buttonClick(value : string) {
+   this.childEvent.emit(value)
+ }
+}
+
+In child html file:
+
+<button type='submit'
+(click)="buttonClick(username.value)">
+ click
+</button>
+
+In Parent Component:
+
+<app-child
+(childEvent)="addName($event)">
+</app-child>
+Page 54 — ViewChild / Sharing Between Unrelated Components
+
+Sharing data using ViewChild decorator :
+Viewchild allows child component to be injected in parent component.
+This make viewchild more powerful. It allows parent to control the child method and properties.
+But parent can get acess to the properties after viewinit event. That means we have to implement ngAfterViewInit lifecycle hook in order to get the properties from parent component.
+Sharing data bet’n not related components :
+
+When there is no relation bet’n the components we can not pass the data using above method
+
+We can use data-service
+
+For creating data service, we have to define behaviour subject. Behaviour subject hold the current value and last value.
+
+I always prefer to use behaviourSubject because of following reason :
+
+It automatically updates the latest value whenever subscribed.
+Always give last value when called via getValue() method
+No need to call next, just create a set and get method in order to get value.
+Page 55 — ng-template / ng-container
+
+ng-template , ng-container , ng-content
+ng-template
+
+Purpose :
+
+To define as template that you can reuse throughout the component application
+
+Usage :
+
+It does not render any DOM elements by itself, Instead it provides a blueprint for piece of UI that can be used in various places.
+
+<ng-template #mytemplate>
+ <div>This is a reusable component</div>
+</ng-template>
+You can reuse this template elsewhere in your application using angulars * ngTemplateOutlet
+Ng-container.
+
+Purpose :
+
+To group elements together without adding extra DOM elements.
+
+Usage :
+
+It is useful when you want to apply structural directives like (*ngIf or *ngFor) without introducing additional HTML elements.
+
+Page 56 — ng-container / ng-content
+
+e.g if there are two structural directives being called on one div
+
+<div *ngIf="" *ngFor="">
+</div>
+
+It will gives error.
+
+So without adding any extra element in DOM
+
+<ng-container *ngIf="details">
+ <div *ngFor="let info of details">
+   {{ }}
+ </div>
+</ng-container>
+Ng-content
+
+The ng-content is used when we want to insert the content dynamically inside the component that helps to increase component reusability.
+
+using ng-content we can pass content inside the component selector and when angular parses that content that appears at the place of ng-content.
+
+Page 57 — 3 Ways to Merge Array in JS
+
+3 ways to merge Array in JS.
+merge using the spread operator — immutable
+merge using Array.concat() — immutable
+merge using Array.push() — mutable
+const array1 = [1,2,3]
+const array2 = [2,3,4]
+
+const MergedArray = [...array1, ...array2]
+
+The order of merged array inside the array literal does matter : item of the merged array are inserted in the same order as the array appear inside the literal.
+
+Merge using array.concat()
+const mergedArray = array1.concat(array2)
+merge array.push()
+
+The merge performed using spread operator or array.concat() creates a new array. However, some time you don’t want to create a new array, but rather merge it into some existing array.
+
+Page 58 — JS Array Methods
+
+JS Array Methods:
+.map()
+
+This method creates a new array with the result of calling a provided function on every element in this array.
+
+filter()
+
+Creates a new array with only elements that passes the condition inside the provided function.
+
+Sort()
+
+This method is used to arrange/sort array’s element either in discending or ascending order
+
+forEach()
+
+It is used to or helps to loop over the array by executing a provided callback function for each element in an array.
+
+Page 59 — concat / every / some / includes / join
+
+Concate()
+
+This method is used to merge two or more array and returns new array, without changing the existing array.
+
+every()
+
+This method checks every element in the array that passes the condition, returning true or false as appropriate.
+
+Some()
+
+This method checks if at least one element in the array that passes the condition, returning true or false.
+
+includes()
+
+This method checks if an array includes the element that passes condition, returning true or false as appropriate.
+
+Join()
+
+This method return new string by concatenating all of the array’s seperated by the specified seperator.
+
+Const element = [1,2,3,4]
+
+console.log(element.join('-'))
+
+O/P → 1-2-3-4
+
+Page 60 — reduce() in JS
+
+Reduce()
+
+The reduce in JS is a predefined method used to reduce an array to a single value by passing a callback function on each element of the array.
+
+It accept function executed on all the items of the specified array in the left-to-right sequence.
+This returned single value is stored in the accumulator.
+This method applies a function against an accumulator and each element in the array to reduce it to a single value.
+
+e.g.
+
+const array1 = [1,2,3,4,5]
+
+const accumulatedArray = array1.reduce(
+ (accumulator, item) => {
+   return accumulator + item
+ }, 0
+)
+
+console.log(accumulatedArray)
+
+O/P → 15
+
+Return a single value
+
+Page 61 — find() / findIndex()
+
+find()
+
+This method return the value of the first element in an array that pass the test in a testing function.
+
+The find method of array instance return the first element in the provided array that satisfies the provided testing function
+If no values satisfy the function, undefined return
+
+e.g
+
+const array1 = [5,12,8,130,44];
+
+const found = array1.find(
+ (element) => element > 10
+)
+
+O/P → 12
+
+first item who satisfies the condition.
+
+findIndex()
+
+This method return the index of the first element in an array that pass the test in testing fn.
+
+If no elements satisfy the condition, -1 is returned.
+
+Page 62 — indexOf() / fill()
+
+indexOf()
+
+This method returns the index of the first occurance of the specified element in the array, or -1 if it is not found.
+
+Fill()
+
+The fill() method of array instance changes all element within a range of indices in an array to a static value. It return the modified value.
+
+const array1 = [1,2,3,4]
+
+console.log(array1.fill(0,2,4))
+
+Fill with 0 from position 2 until position 4.
+
+O/P → [1,2,0,0]
+
+console.log(array1.fill(5,1))
+
+Fill with 5 from position 1.
+
+O/P → [1,5,5,5]
+
+console.log(array1.fill(6))
+
+O/P → [6,6,6,6]
+
+Page 63 — slice() / reverse()
+
+Slice()
+
+The slice method of array instance return a shallow copy of portion of an array into a new array object selected from start to end.
+
+(end not included), where start and end represent the index of item in that array. The original array will not modified.
+
+e.g
+
+const animals = ['a','b','c','d','E']
+
+console.log(animals.slice(2))
+
+O/P → [c,d,E]
+
+console.log(animals.slice(2,4))
+
+O/P → [c,d]
+
+console.log(animals.slice(1,5))
+
+O/P → [b,c,d,E]
+
+Reverse()
+
+This method reverse an array in place. Element at last will be first and at first will be last.
+
+Page 64 — push() / pop() / shift() / unshift()
+
+Push()
+
+This method adds one or more element to the end of array and return the new length of the array.
+
+const animals = ['a','b','c']
+
+const count = animals.push('d')
+
+O/P → 4
+
+total lengths of array.
+
+if console.log(animals) → [a,b,c,d]
+
+Pop()
+
+This method removes the last elements from the end of an array and return array.
+
+Shift()
+
+This method removes the first element from an array and return that element.
+
+Unshift()
+
+This method add one or more element to the existing beginning of an array and return the new length of the array.
+
+Page 65 — map() vs forEach() / flatMap()
+
+Map and ForEach()
+The map() method return a new array, where as the forEach() method does not return a new array.
+Map is used to transform the element of an array, whereas forEach() method is used to loop through the element of array.
+flatMap()
+The flat() method creates a new array with the elements of the sub arrays concatenated into it.
+The map() method creates a new array whose element are the result of a mapping function
+The flatMap() method is the combination of the map() method and followed by the flat() method of depth 1.
+The flatMap() method first maps each elements in an array using a mapping function and then fattens the result into new array.
+let newArray = arrg.object.flatMap(callback, thisarg)
+callback is the mapping function.
+this arg is value to use as this when executing callback
+
+Note : flatMap() method doesn’t modify the original array.
+
+Page 66 — flatMap() Example
+
+const arr1 = [1,2,1]
+
+const result = arr1.flatMap((num) =>
+ num === 2 ? [2,2] : 1
+)
+
+console.log(result)
+
+O/P → Array [1,2,2,1]
+
+Page 67 — Difference Between CSS Grid and Flexbox
+
+Diff bet’n CSS Grid and CSS Flexbox.
+Grid:
+CSS Grid layout is a two dimensional grid-based layout system with rows and columns, making it easier to design web pages without having to use floats and positioning.
+Grid is made for two dimensional layout while flexbox is for one. These means flexbox can work on either row or column at a time, but grid can work on both.
+Grids gives you more flexibility to move around the blocks irrespective of your HTML markup.
+Flexbox:
+offers one dimensional layout. It is helpful in allocating and aligning the space among the items in container.
+Flex box offers greater control over alignment and space distribution bet’n items. Being one dimensional flexbox only deals with either column or rows.
+flex direction allows developers to align element vertically or horizontally, which is used when developers create and row or columns.
+Page 68 — Grid vs Flexbox Table
+
+Property	Grid	Flexbox
+Dimension	Two-dimensional	One-dimensional
+features	can flex combination of item through space occupying feature	can place element to extreme alignment
+layout type	layout-first	content first
+CSS grids helps you create the outer layout of page. You can build complex as well as responsive design with this. (layout first)
+flexbox mostly helps align content and move blocks
+Page 69 — Spread Operator Use Cases
+
+Spread operator.
+
+use case →
+
+Concatenating arrays.
+const arr1 = [1,2]
+const arr2 = [5,6]
+
+console.log([...arr1,...arr2])
+
+O/P → [1,2,5,6]
+
+Spreading strings
+const str = "Hello"
+
+console.log([...str])
+
+O/P →
+
+['H','e','l','l','o']
+
+Merging and cloning obj.
+const obj1 = {a:1, b:2}
+const obj2 = {b:3, c:4}
+
+const mergeObj = {
+ ...obj1,
+ ...obj2
+}
+
+O/P → {a:1, b:3, c:4}
+
+Page 70 — Spread vs Rest Operator
+
+The spread operator in javascript is a syntax introduced in ECMAScript 6 that allows you to spread the elements of an iterable such as arrays, strings or object, into another iterable or function call.
+It is denoted by (...) followed by expression or an iterable.
+It can be used to concatenate arrays, create shallow copies of arrays, convert strings into array of characters, merge or clone object and dynamically pass values into function.
+Spread operators are always on the right side of expression.
+If we use it on left side of expression then it will work as rest parameter.
+Rest element must be the last element.
+
+e.g
+
+const [a,b,...other] = [1,2,3,4,5]
+
+O/P →
+
+a = 1
+b = 2
+other = [3,4,5]
+
+Page 71 — Spread vs Rest Operator
+
+When ever we are destructuring objects we should kept same name as key.
+
+otherwise it will throws an error.
+
+Rest parameter takes multiple values and packed them in array.
+Spread operators
+use ...dots before an iterable object
+used to expand elements of an iterable
+Rest operator
+use ... before variable name.
+Used to gather remaining elements into an array.
+Page 72 — Set() Method in JS
+
+Set() method in JS.
+A set object in JS is a collection of unique values, where each value can only occurs once within the set.
+It provide efficient way to store, retrive and manipulate distinct values without worrying duplicates.
+Set allows any datatype as value including primitive data type, objects and even other sets.
+
+e.g
+
+const set = new Set();
+const set = new Set(['value1','value2'])
+
+Adding value.
+
+set.add('value1')
+It is imp to note that two object with the same properties and values will be considered as distinct set in set.
+const obj1 = {name:'adam', age:30}
+const obj2 = {name:'adam', age:30}
+
+set.add(obj1)
+set.add(obj2)
+
+console.log(set)
+
+O/P :
+
+Set(2) {
+ {name:'adam', age:30},
+ {name:'adam', age:30}
+}
+Page 73 — Set Methods
+
+checking value existence.
+const set = new Set(['v1','v2'])
+
+console.log(set.has('v1'))
+
+O/P → True
+
+Adding values
+set.add(v1)
+
+will add v1
+
+Removing values
+set.delete(v1)
+Iterating over values
+const set = new Set(['v1','v2'])
+
+set.forEach((value) => {
+ console.log(value)
+})
+
+O/P → v1, v2
+
+Value()
+for (const value of set.value()) {
+ console.log(value)
+}
+
+O/P → v1, v2
+
+Page 74 — Map Object in JS
+
+DS (Data Structure)
+The map object
+The map object stores data in key/value pair structure, just like an object.
+
+The main diff bet’n regular object and map are
+
+A map has any type of data as key.
+A map maintains the order of data added to the objects.
+const myMap = new Map()
+set(key,value) → add key/value pair
+get(key) → Retrives value from a Map (Return undefined if key doesn’t exist)
+has(key) → checks map has a specific key
+delete(key) → Removes a specific key.
+clear() → Removes all item from map
+key() → Return all keys in map
+values() → Return all values in map
+entries() → Return all key and values in map
+size() → Return the number of item in map
+
+How to use an object to create map :
+
+const person = {
+ 'name' : 'J',
+ 'age' : '20'
+}
+Page 75 — Iterating Map Object
+
+const myMap = new Map(Object.entries(person))
+
+console.log(myMap)
+
+O/P →
+
+Map(2) {
+ 'name' => 'J',
+ 'age' => 20
+}
+Iterate over map object data
+const myMap = new Map([
+ ['1','jack'],
+ ['2','jill'],
+ ['a','b']
+]);
+
+iterate using for each method.
+
+myMap.forEach((key,value) => {
+ console.log(key,value)
+})
+
+or using for-of loop.
+
+for (const item [key,value] of myMap) {
+ console.log(key,value)
+}
+Page 76 — First Class Functions in JS
+
+first class functions in JS.
+first class functions, also known as first-class citizens or first-class objects, are a fundamental concept in programming language.
+They refer to functions that can be treated in the same way as any other data type, such as no, strings or objects.
+
+In JS that function can be.
+
+Assigned to variables
+Passed as arguments
+Return from function.
+const greet = function(name) {
+ console.log(`Hello, ${name}`)
+}
+greet('Anni')
+
+O/P → Hello Anni.
+
+Returning function from functions
+function multipier(factor) {
+
+ return function(x) {
+   return x * factor
+ }
+}
+const double = multipier(2);
+const triple = multipier(3);
+
+console.log(double(5), triple(5))
+
+O/P → 10,15
+
+Page 77 — Higher Order Functions
+
+Higher order functions.
+Higher order function is a function that either,
+takes one or more function as arguments
+or return a function as it results
+Higher order functions operates on other function, either by using them to perform task or by producing new functions with customized behaviour.
+function as argument
+function as a return value
+Abstraction
+composition
+
+e.g map function.
+
+const no = [1,2,3,4,5]
+
+const squareNumbers = no.map(function(num){
+ return num * num
+})
+console.log(squareNumbers)
+
+O/P → [1,4,9,16,25]
+
+Examples :
+
+filter
+setTimeout
+Real world scenarios:
+Event Handling
+Array Manipulation
+Asynchronous operation
+functional libraries
+Working with callback fun’s
+Page 78 — slice() and splice()
+
+slice() and splice()
+slice()
+The slice() function creates a duplicates of a specified section of an array in a new array.
+The original array is not modified.
+The term slice literally means to cut something into pieces. It is used to cut out elements from an array. It does not affect original array.
+array.slice(start, end)
+start denote the index at which array start slicing.
+End denote the index at which the array stop slicing.
+The return value at the slice() is an array of the values found bet’n start and end excluding the value at end.
+If end is not specified, the length of the array would be used. Hence, all values from start index would be return.
+
+e.g
+
+const char = ['a','b','c','d','e']
+
+char.slice(2)      // [c,d,e]
+
+char.slice(2,4)    // [c,d]
+
+char.slice(1,5)    // [b,c,d,e]
+
+char.slice(-2)     // [d,e]
+
+char.slice(2,-1)   // [c,d]
+
+char.slice()       // [a,b,c,d,e]
+
+Page 79 — splice()
+
+2) splice() → Modify the original array
+The splice() function modifies an array by deleting, replacing, or inserting entries at a specified index.
+It is used to remove elements from an array or replace them.
+array.splice(start, deleteCount, newEle1, newEle2, ...)
+start → denotes the index from which the method will start its operation on the array.
+deleteCount → denotes the number of values to be deleted from start. If the value is 0, nothing will be deleted.
+newEle1, newEle2 → denotes the values that would be added after the start.
+Example
+const month = ['a','b','c','d','e'];
+
+month.splice(1,0,'feb');
+console.log(month);
+
+O/P →
+
+['a','feb','b','c','d','e']
+month.splice(4,1,'may');
+
+O/P →
+
+['a','b','c','d','may']
+
+(start count, delete count, adding element)
+
+Page 80 — Async Pipe
+
+The Async Pipe
+The async pipe is better and more recommended way of working with observables in a component.
+Does three task:
+It subscribes to the observable and emits the last value emitted.
+When a new value is emitted, it marks the component to be checked for changes.
+The async pipe automatically unsubscribes when the component is destroyed to avoid potential memory leaks.
+Note
+Keep component change detection strategy to OnPush.
+Page 81 — Forms in Angular
+
+Forms
+Application use form to enable user to log in, to update profile, to enter sensitive information and perform many other data entry tasks.
+Angular provide two diff approaches to handling a form.
+Reactive
+Template Driven
+Both capture user input event from the view, validate user input, create a form model and data model to update and provide a way to track changes.
+Reactive Forms
+Provide direct, explicit access to the underlying form's object model.
+They are most robust.
+Page 82 — Reactive Forms
+
+Reactive Forms
+Reactive forms provide a model-driven approach to handling form input whose values change over time.
+Uses an explicit and immutable approach to managing the state of form at a given point in time.
+Reactive forms are built around observable streams where form input and values are provided as stream of input values, which can be accessed synchronously.
+To use Reactive Form Control
+Import the ReactiveFormsModule from @angular/forms.
+In component:
+name = new FormControl('');
+Register the control in the template.
+<input [formControl]="name">
+Page 83 — FormGroup
+
+FormGroup
+Define a form with a fixed set of controls that you can manage together.
+Just as a FormControl instance gives you control over a single input field, a FormGroup instance tracks the form state of a group of FormControl instances.
+Each control in a FormGroup instance is tracked by name when creating the FormGroup.
+Example
+formGroup = new FormGroup({
+  firstName: new FormControl(''),
+  lastName: new FormControl('')
+});
+In HTML we can get control by using formControlName attribute.
+Page 84 — FormBuilder Service
+
+Using FormBuilder Service to Generate Controls
+Creating FormControl instances manually can become repetitive when dealing with multiple forms.
+The FormBuilder service provides convenient methods for generating controls.
+Steps
+Import FormBuilder class.
+Inject FormBuilder service.
+Generate the form controls.
+FormBuilder Service has three methods
+control()
+group()
+array()
+These are factory methods for generating instances of FormControl, FormGroup and FormArray.
+Example
+profileForm = this.fb.group({
+  firstName: [''],
+  lastName: ['']
+});
+Page 85 — Reactive Forms Important Classes
+
+ReactiveFormsModule
+FormGroup
+A class that tracks the value and validity state of a group of FormControl instances.
+FormControl
+A class that tracks the value and validity state of an individual form control.
+FormBuilder
+A service that provides convenient methods for generating FormGroup and FormControl instances.
+formControlName
+Directive that binds an existing FormControl instance to a DOM element.
+myForm.controls['controlName']
+Access individual form control within a FormGroup.
+Page 86 — Angular Interceptor
+
+Interceptor
+An interceptor is a service that can inspect and transform HTTP request and response.
+It acts as middleware for HttpClient class, allowing you to modify requests before they are sent and responses before they are processed by the application.
+Common Use Cases
+Add Authentication Token (JWT)
+Global Error Handling
+Logging API Requests/Responses
+Show/Hide Loader
+Request/Response Transformation
+@Injectable()
+export class AuthInterceptor implements HttpInterceptor {
+
+  intercept(req: HttpRequest<any>,
+            next: HttpHandler) {
+
+    const clonedReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+
+    return next.handle(clonedReq);
+  }
+}
+
+Page 87 — Synchronous vs Asynchronous Programming
+
+Asynchronous and Synchronous
+Synchronous Programming
+In synchronous programming, tasks are executed one after another in sequence.
+Each task must complete before the next one can begin.
+The program waits for a task to finish before moving on to the next one.
+Makes execution predictable but potentially slower, especially if a task involves waiting (like network requests).
+Asynchronous Programming
+Asynchronous programming allows multiple tasks to run concurrently without waiting for each to complete.
+It improves efficiency by enabling tasks like network requests.
+The program doesn't wait for an asynchronous task to complete before continuing with the next task.
+In JS
+Callback
+Promises
+Async/Await
+In Angular
+Observables
+Page 88 — Closure in JavaScript
+
+Closure
+Whenever there are two functions bundled together, the inner function can access the variables declared in the outer (parent) function even after the outer function has been executed.
+This phenomenon is called Closure.
+The inner function forms a closure with its lexical scope.
+Lexical Scope
+The lexical scope of a function is the ability to access variables defined in:
+Its parent scope
+Parent's parent scope
+And so on until the global window object
+Page 89 — ES6 Features (let, const, var)
+
+ES6 Features
+1) let and const
+let
+Declare block-scoped variables.
+Prevents issues like variable hoisting seen with var.
+Used when you need to reassign values.
+const
+Declare block-scoped constants.
+Cannot be reassigned after initialization.
+Useful for values that should not change.
+var
+Variables declared with var can be redeclared and reassigned without issue.
+Variables declared with var have global scope if declared outside a function.
+Variables declared with var have function scope if declared inside a function.
+var is hoisted to the top of its execution context and initialized as undefined.
+let
+Variables declared with let cannot be redeclared but can be reassigned.
+It has block scope if declared inside a block.
+It has function scope if declared inside a function.
+Page 90 — let vs const
+
+let
+Variables declared with let have global scope for the same file (not all files) if declared outside a function and block.
+If let variable is declared inside a block, it cannot be accessed outside the block.
+const
+The const keyword variable must be declared and assigned together, otherwise it throws an error.
+Variables declared with const cannot be redeclared nor reassigned.
+It has block scope if declared inside a block.
+It has function scope if declared inside a function.
+It has global scope for the same file if declared outside a function.
+Page 91 — Arrow Function / Destructuring / Spread Operator
+
+2) Arrow Function
+Arrow function allows a shorter syntax for writing function expressions.
+You don't need the function keyword, return keyword and curly brackets (for simple expressions).
+ES5
+var x = function(x, y) {
+  return x * y;
+}
+ES6
+var x = (x, y) => x * y;
+They do not have their own this.
+They are not suitable for defining object methods.
+They are not hoisted. They must be defined before use.
+3) Object Destructuring
+When destructuring objects, you must use the same names as the corresponding object keys (names).
+The order of the keys does not matter.
+4) Destructuring of Array
+
+(Heading only in notes)
+
+5) Spread Operator
+Expands arrays or objects into individual elements.
+Can be used for combining arrays or shallow cloning objects.
+Page 92 — More ES6 Features
+
+Example:
+
+const arr = [1,2,3];
+
+const newArr = [...arr, 4, 5];
+Additional ES6 Features
+JavaScript Maps Method
+JavaScript Set Method
+JavaScript Classes
+JavaScript Rest Operator
+Promise
+Template Literals
+Use backticks ( ) for multiline strings and embedded expressions via ${}.
+let name = 'Ankush';
+
+let message = `Hello, ${name}, welcome`;
+12) Default Parameters
+Allows you to set default values for function parameters, making it optional to pass all arguments.
+function greet(name = 'user') {
+  return `Hello, ${name}`;
+}
+Page 93 — switchMap / concatMap / mergeMap / exhaustMap
+
+switchMap
+When a bunch of values are emitted quickly, switchMap only cares about the latest one and ignores the rest.
+It does not wait for the previous call to complete before making a new one.
+concatMap
+Processes observables sequentially.
+Ensures the next observable starts only after the previous one completes.
+Creates a queue of requests and handles them one after another.
+Waits for the previous call to finish before making the next one.
+mergeMap
+Unlike concatMap, mergeMap does not wait for the previous call to finish.
+Emits all requests as they come in, processing them at the same time.
+Response order may not match request order.
+exhaustMap
+Processes the first request and ignores all other requests until the first one is completed.
+Page 94 — Event Loop in JavaScript
+
+Event Loop in JS
+The event loop in JavaScript is a mechanism that allows the language to handle multiple operations, like user interaction or server responses, without blocking the main thread.
+How it is executed
+1) Call Stack
+Where your code gets executed, one function at a time.
+2) Web APIs
+Handle asynchronous tasks like timers or network requests.
+3) Callback Queue / Task Queue
+Holds asynchronous tasks that are ready to be processed.
+4) Event Loop
+Constantly checks if the call stack is empty.
+If it is empty, it takes tasks from the callback queue/task queue and adds them to the call stack for execution.

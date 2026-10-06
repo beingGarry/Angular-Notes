@@ -1,0 +1,184 @@
+================================================================================
+TOPIC 9: CALL, APPLY, BIND
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+Everything in JavaScript is an object at the root. Functions are also objects. There are three methods that exist on any function: "CALL, APPLY, and BIND."
+
+Functions have properties too:
+console.log(greet.name)   // 'greet' (name of the function)
+console.log(greet.length) // 2 (number of arguments the function accepts)
+
+
+1. CALL 
+- CALL is a predefined JavaScript method that CHANGES THE CONTEXT of the THIS keyword of ONE OBJECT TO ANOTHER. In other words, one object can BORROW a method from another object.
+
+Syntax: functionName.call(object, arg1, arg2, ...)
+
+- CALL does NOT change context of THIS if called on ARROW function.
+
+
+2. APPLY
+- Apply is EXACTLY SIMILAR to CALL. The only DIFFERENCE is the "Apply function accepts ARGUMENTS AS AN ARRAY".
+
+Syntax: functionName.apply(object, [arg1, arg2, ...])
+
+- APPLY does NOT change context of THIS if called on ARROW function.
+
+
+3. BIND 
+- BIND is similar to CALL in terms of syntax. The DIFFERENCE is BIND returns the COPY of the function on which it is called. So the returned function can be stored in a variable and called later.
+
+Syntax: var returnedFunc = functionName.bind(object, arg1, arg2, ...)
+        returnedFunc(); // call it later
+
+- BIND does NOT change context of THIS if called on ARROW function.
+
+
+EXAMPLES
+---------
+
+* Basic Call Example
+var homeAddress = {
+  city: "Fresno", state: "California",
+  getAddress: function () { return this.city + ", " + this.state; },
+};
+var workAddress = { city: "Austin", state: "Texas" };
+
+console.log(homeAddress.getAddress()); // Fresno, California
+console.log(homeAddress.getAddress.call(workAddress)); // Austin, Texas # workAddress "borrows" getAddress from homeAddress
+
+
+* Call with Arguments
+var homeAddress = {
+  city: "Fresno", state: "California",
+  getAddress: function (streetNo, streetName) {
+    return streetNo + " " + streetName + " " + this.city + ", " + this.state;
+  },
+};
+var workAddress = { city: "Austin", state: "Texas" };
+console.log(homeAddress.getAddress.call(workAddress, "3224", "La Frontera Blvd")); # 3224 La Frontera Blvd Austin, Texas
+
+
+* Apply - arguments passed as array
+console.log(homeAddress.getAddress.apply(workAddress, ["3224", "La Frontera Blvd"])); # 3224 La Frontera Blvd Austin, Texas
+
+
+* Bind - returns copy of function
+var returnedBindFunc = homeAddress.getAddress.bind(workAddress);
+console.log(returnedBindFunc()) # Austin, Texas
+
+* Bind with arguments
+var returnedBindFunc = homeAddress.getAddress.bind(workAddress, '3626', 'North Blythe Avenue');
+console.log(returnedBindFunc()) # 3626 North Blythe Avenue Austin Texas
+
+
+* Call/Apply/Bind with undefined or null -> THIS = window object
+function personOne() { return this; }
+console.log(personOne.call(undefined)); # window object
+console.log(personOne.call(null));      # window object
+
+// Call with other values -> constructor version
+console.log(personOne.call(""));    // String {''}
+console.log(personOne.call(true));  // Boolean {true}
+console.log(personOne.call(1));     // Number {1}
+
+// In STRICT MODE with primitives -> returns the primitive itself
+// console.log(personOne.call("")); // ''  (strict mode)
+
+
+INTERVIEW PROBLEMS
+-------------------
+
+// Problem 1: Call, Apply, Bind on function expression
+const personOne = { age: '20' };
+const personTwo = { age: '30' };
+const getAge = function () { return this.age; };
+
+console.log(getAge.call(personOne));    // 20
+console.log(getAge.apply(personOne));   // 20
+console.log(getAge.bind(personOne)());  // 20
+
+console.log(getAge.call(personTwo));    // 30
+console.log(getAge.apply(personTwo));   // 30
+console.log(getAge.bind(personTwo)());  // 30
+
+
+// Problem 3: Arrow function - call/apply/bind DON'T work to change THIS
+const personOne = { age: '20' };
+var age = '10'; // var attaches to window
+const getAge = () => { console.log(this); return this.age; };
+
+console.log(getAge());               // 10 (THIS = window, window.age = '10')
+console.log(getAge.call(personOne)); // 10 (call doesn't change THIS in arrow)
+console.log(getAge.apply(personOne)); // 10
+console.log(getAge.bind(personOne)()); // 10
+
+
+// Problem 4: Find Max/Min with Call, Apply, Bind
+const numbers = [4,3,5,1,6];
+
+console.log(Math.max.call({}, ...numbers))   // 6
+console.log(Math.max.apply({}, numbers))     // 6
+console.log(Math.max.bind({}, ...numbers)()) // 6
+
+console.log(Math.min.call({}, ...numbers))   // 1
+console.log(Math.min.apply({}, numbers))     // 1
+console.log(Math.min.bind({}, ...numbers)()) // 1
+
+
+// Problem 5: Merge arrays with Call, Apply, Bind
+const array1 = [1, 2, 3];
+const array2 = [4, 5];
+array1.push.call(array1, ...array2)  // array1 = [1, 2, 3, 4, 5]
+// or:
+// array1.push.apply(array1, array2)
+// array1.push.bind(array1, ...array2)()
+
+
+// Problem 7: Fix setTimeout context loss using Bind
+const person = {
+  name: "Bruce Wayne",
+  getName: function() { console.log(this.name); }
+};
+// Wrong: setTimeout(person.getName, 2000) -> undefined after 2 seconds
+// Right:
+setTimeout(person.getName.bind(person), 2000) // Bruce Wayne after 2 seconds
+
+// NOTE: Cannot use CALL or APPLY here because they INVOKE immediately.
+// BIND returns a function COPY which is what setTimeout needs.
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Borrowing utility methods from one object to another
+- Fixing 'this' context in async callbacks / setTimeout
+- Function currying using bind
+- Finding max/min in arrays using apply
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the difference between Call, Apply, and Bind?
+A1. Call: Changes THIS context, invokes immediately, args are comma-separated.
+    Apply: Changes THIS context, invokes immediately, args are passed as ARRAY.
+    Bind: Changes THIS context, returns COPY of function (doesn't invoke immediately),
+          args are comma-separated.
+
+Q2. Do Call, Apply, Bind work on arrow functions?
+A2. No. Arrow functions don't have their own THIS. Call/Apply/Bind cannot change the THIS context of arrow functions.
+
+Q3. What happens when you pass null or undefined as the first argument to call?
+A3. THIS inside the function will refer to the window object (non-strict mode).
+    In strict mode, THIS will be undefined.
+
+Q4. How to fix setTimeout losing 'this' context?
+A4. Use bind: setTimeout(obj.method.bind(obj), delay)
+    Cannot use call or apply here because they invoke the function immediately.
+
+Q5. What are two definitions of Call?
+A5. 1. One object can borrow a method from another object.
+    2. CALL changes the context of the THIS keyword from one object to another.
+
+

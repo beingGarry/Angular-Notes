@@ -1,0 +1,40 @@
+Page 24 — Data Binding / One Way Binding
+
+Data Binding :
+
+Data binding is the way for communication betn template and typescript class.
+
+One way binding :
+Property Binding → from component file (ts file) to view.
+e.g[property] = 'data'
+
+string interpolation → from component file to view
+{{data}}
+
+Event Binding → From view to component file
+(event) = "expression"
+
+
+Page 25 — Two Way Data Binding / Linter
+
+Two way data Binding
+
+view to component to view
+
+[(ngModel)] = "data"
+
+The 2 way binding nothing but both property binding and event binding applied together.
+
+Property binding is one way from component to view
+
+Event binding is one way from view to component
+
+If we combine both we will get the two way binding.
+
+what is linter used for ?
+
+Lint or linter, is a static code analysis tool used to flag programming errors, bugs, stylistic errors and suspicious construct
+
+Two way data binding gives you way to share data betn view to ts and vice versa simultaneously.
+
+When we bind data using two way data binding the view and ts are in sync and updated data accordingly.

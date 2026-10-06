@@ -1,0 +1,188 @@
+What is Zone.js in Angular?
+
+Zone.js is a library that Angular traditionally uses to detect async operations and automatically update the UI.
+
+It patches browser async APIs like:
+
+setTimeout
+Promise
+addEventListener
+XHR / fetch
+DOM events
+
+So whenever something async happens, Angular knows:
+
+“Something changed → run change detection → update UI”
+
+Simple Example
+count = 0;
+
+increase() {
+  setTimeout(() => {
+    this.count++;
+  }, 1000);
+}
+
+Without Zone.js, Angular normally wouldn’t know that count changed inside setTimeout.
+
+But because Zone.js patches setTimeout, Angular gets notified and refreshes the UI automatically.
+
+- How Zone.js Works Internally
+
+It creates something called a Zone around async tasks.
+
+Whenever async code finishes:
+
+Zone.js intercepts it
+
+Tells Angular:
+
+“Hey, something async completed”
+
+Angular runs change detection for the app
+Problem with Zone.js
+
+Although convenient, it has several drawbacks.
+
+1. Runs Too Much Change Detection
+
+Angular doesn’t know what changed.
+
+It only knows:
+
+“Some async operation happened.”
+
+So Angular checks many components unnecessarily.
+
+Example:
+
+setTimeout(() => {
+  console.log("Timer done");
+}, 1000);
+
+Even if no UI data changed, Angular may still trigger change detection.
+
+This affects performance in large apps.
+
+2. Monkey Patching Browser APIs
+
+Zone.js patches native browser methods.
+
+This can cause:
+
+debugging complexity
+stack trace issues
+compatibility problems
+harder optimization
+3. Difficult Mental Model
+
+Developers sometimes face issues like:
+
+NgZone.run()
+runOutsideAngular()
+unexpected change detection
+ExpressionChangedAfterItHasBeenChecked errors
+
+Because Zone.js works magically in the background.
+
+4. Bad for Modern Reactive Architecture
+
+Modern Angular is moving toward:
+
+Signals
+Fine-grained reactivity
+Explicit state tracking
+
+Zone.js is more:
+
+“global detection”
+
+Signals are:
+
+“precise detection”
+
+Why Angular is Moving Away from Zone.js
+
+Starting from newer Angular versions (especially Angular 16+ and more strongly in Angular 17–19), Angular introduced:
+
+✅ Signals
+
+Signals track exactly which value changed.
+
+Example:
+
+count = signal(0);
+
+increase() {
+  this.count.update(v => v + 1);
+}
+
+Now Angular knows:
+
+exactly which signal changed
+exactly which component depends on it
+
+So no need to scan the whole app.
+
+Zone-less Angular
+
+Angular now supports:
+
+provideZoneChangeDetection({
+  eventCoalescing: true
+})
+
+and even fully zoneless setups.
+
+This means Angular can work without Zone.js.
+
+Benefits:
+
+better performance
+predictable updates
+smaller bundle size
+less magic
+faster rendering 
+
+Old Angular vs Modern Angular
+- Old (Zone.js)	                                      Modern (Signals/Zoneless)
+Global change detection	                              Fine-grained updates
+Magic async tracking	                              Explicit reactivity
+Checks many components	                              Updates only affected UI
+Monkey patches browser APIs	                          Native browser behavior
+Harder debugging	                                  More predictable
+Real-World Analogy
+Zone.js approach
+
+Imagine office manager says:
+
+“Someone changed something in office. Check EVERY desk.”
+
+Signals approach
+
+Manager says:
+
+“Desk 24 changed. Only check Desk 24.”
+
+Much faster and smarter.
+
+Is Zone.js Removed Completely?
+
+No.
+
+Angular still supports it because:
+
+millions of existing apps use it
+migration takes time
+many libraries still depend on it
+
+But Angular’s future direction is clearly:
+
+Signals
+Zoneless
+Fine-grained reactivity
+Interview Answer (Short Version)
+
+Zone.js is a library Angular uses to intercept async operations and automatically trigger change detection. It patches browser APIs like setTimeout, promises, and events so Angular knows when to update the UI.
+
+Angular is moving away from Zone.js because it causes unnecessary global change detection, adds performance overhead, patches native APIs, and makes debugging harder. Modern Angular uses Signals and zoneless change detection for more precise, faster, and predictable UI updates.

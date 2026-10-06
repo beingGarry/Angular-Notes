@@ -1,0 +1,148 @@
+Page 18 — Directives / Component Directive
+
+Directives
+
+Directives are defined as classes that can be add new behavior to the element in the template or modify existing behaviour.
+
+The purpose of Directives in angular is to manipulate the DOM, be it by adding new element into dom or removing elements and even changing the appearance of the dom elements.
+Component Directive :
+
+Special directive in angular are called components. Since this type of directive has a template or template URL
+
+In Component directive, you’ll find three part —
+
+Selector → Represent the template tag, which specifies the starting and end of the component.
+templateURL → Is define which particular template is for the component.
+styleUrls → It includes all the type of fashion formats for the actual component.
+Page 19 — Structural / Attribute Directive
+
+Structural Directive :
+
+This type of directive starts with * sign. These directive are used to manipulate and change the structure of the DOM elements.
+
+ngIf — adding or removing element from DOM.
+ngFor — lists elements of every situation.
+ngSwitch — The ngswitch directive specifies an expression to match against.
+The ngswitchCase directive defines the expression to match.
+It renders every view that matches.
+If there are no matches, the view with the NgSwitchDefault directive is rendered.
+Attribute Directive
+
+This type of angular directive is used to make behavior or element changes in the appearance and behavior of an element.
+
+e.g — ngStyle (applying style), ngClass (applying CSS class)
+
+Page 20 — Custom Directive
+
+Custom Directive
+A custom directive in angular is a way to extend the HTML with new behavior and functionality.
+It’s a feature that allows you to create custom HTML elements, attributes, or classes that can be reused across the your application.
+Generate the directive
+ng generate directive Highlight
+will generate file highlight.directive.ts
+import { directive, elementRef, Hostlistener, Input } from
+
+@Directive({
+ selector : '[appHighlight]'
+})
+
+export class HighlightDirective {
+
+ @Input('Highlight') HightColor : string;
+
+ constructor(private el : ElementRef) {}
+
+ private Highlight(color : string) {
+   this.el.nativeElement.style.backgroundColor = color;
+ }
+}
+Page 21 — Using Directive / Structural Custom Directive
+
+Use the directive
+<div appHighlight = 'lightColor'> Hover </div>
+
+<div appHighlight = 'lightColor'> change </div>
+
+Directive
+
+e.g of Structural Custom Directive (*ngIf)
+
+ng g directive simpleIf
+import
+{ Directive, Input, TemplateRef, ViewContainer } from
+@Directive({
+ selector : '[appSimpleIf]'
+})
+
+export class SimpleIfDirective {
+
+ constructor(
+   private templateRef : TemplateRef<any>,
+   private viewContainer : ViewContainerRef
+ ) {}
+
+ @Input() set appSimp(condition : boolean) {
+
+   if(condition) {
+     this.viewContainer.createEmbeddedView(this.templateRef);
+   } else {
+     this.viewContainer.clear();
+   }
+ }
+}
+
+Page 22 — appSimpleIf Explanation
+
+special code for * support
+
+Ensure your directive class can handle the “templateRef” and “viewContainerRef” to manage embedded view, allowing * syntax to work seamlessly.
+
+Explanation :
+
+@Directive :
+
+The decorator marks the class as an angular directive and specifies its css attribute selector.
+
+TemplateRef :
+
+Represent an embedded template that can be used to instantiate embedded view.
+
+ViewContainerRef :
+
+Represent a container where one or more view can be attached
+
+@Input() set appSimpleIf (condition : Boolean)
+
+An input property that accepts a boolean condition. When the condition is true, it insert the embedded view into container, when false it Removes it.
+
+Use →
+<div *appSimpleIf = 'true'> This </div>
+Page 23 — ElementRef / Renderer2
+
+ElementRef :
+
+Which allow us to acess the element from the template directly, just like this,
+
+Constructor(element : ElementRef) {
+ // can use element here to access the element
+}
+Renderer2
+
+Renderer2 is a utility class that provides methods to manipulate and interact with DOM. It is used to perform operations such as creating, modifying and removing elements, applying style and listing to events.
+
+export class ExampleComponent {
+
+ constructor(private renderer : Renderer2) {}
+
+ @ViewChild('test') test : ElementRef;
+
+ Active function() {
+   this.renderer.addClass(this.test.nativeElement,
+   "active")
+ }
+
+ Remove function() {
+   this.renderer.removeClass(this.test.nativeElement,
+   active)
+ }
+}

@@ -1,0 +1,657 @@
+================================================================================
+TOPIC 4: ASYNC/AWAIT - PART 1
+(Async keyword, Await keyword, Call Stack behavior, Error Handling, API)
+================================================================================
+
+TOPICS COVERED
+---------------
+1. Async/Await
+2. API Implementation
+
+
+DEFINITION & EXPLANATION
+--------------------------
+So far, we have seen setTimeout, callBacks, and Promises to handle asynchronous
+code in the synchronous language JavaScript. With every step, we learned better
+methods to deal with asynchronous code. Async/Await is also one step up to the
+previous topic which was Promises.
+
+Async/Await is similar to promises that enable JavaScript to perform
+asynchronous operations. We can also say:
+
+"async/await is a SYNTACTIC SUGAR on Promises."
+
+Because under the hood, Async/Await USES PROMISES to handle async requirements.
+Async/Await just makes it easier to write promises.
+
+
+ASYNC KEYWORD
+--------------
+Async is a keyword that is written in the FRONT of the function. Whatever
+value is being returned from a function with async keyword, will be WRAPPED
+IN A PROMISE automatically.
+
+function z() { return 1; }
+console.log(z());      // Output: 1  (plain value)
+
+async function z() { return 1; }
+console.log(z());      // Output: Promise { 1 }  (fulfilled, value: 1)
+
+We can return anything from an async function — number, string, array,
+Boolean, null, undefined, object, or even a function. Whatever value is
+returned will be wrapped in a fulfilled promise.
+
+
+// Returning a promise with no state change
+async function z() {
+  return new Promise(() => { });  // nothing done to the promise
+}
+console.log(z());
+// Output: Promise { <pending> } -- value: undefined (nothing settled)
+
+
+// Returning a RESOLVED promise
+async function z() {
+  return new Promise((resolve, reject) => {
+    resolve(1)
+  });
+}
+console.log(z());
+// Output: Promise { 1 } -- state: fulfilled, value: 1
+
+// If a promise is returned from an async function and resolve is called,
+// the returned promise will be in a FULFILLED state and the value of the
+// promise is the argument passed to the resolve function.
+
+
+// Returning a REJECTED promise
+async function z() {
+  return new Promise((resolve, reject) => {
+    reject(1)
+  });
+}
+console.log(z());
+// Output: Promise { <rejected> 1 } -- error is uncaught
+
+
+// Are two async functions returning same value equal?
+async function z() { return new Promise((resolve) => { resolve(1) }); }
+async function y() { return 1 }
+console.log(y() === z()); // false
+
+REASON: Both promises have the same state and value, but the REFERENCES
+        (memory locations) are not the same. Equality check is false.
+
+
+AWAIT KEYWORD
+--------------
+Await is a keyword that makes a function WAIT for the promise. The await
+keyword can ONLY be used with the async keyword. If you try to use await
+alone, there will be a SYNTAX ERROR.
+
+async function z() {
+  const value = await new Promise((resolve, reject) => {
+    resolve(1);
+  });
+  console.log(value);  // Output: 1 (extracted value, NOT the promise object)
+}
+z();
+
+1. await keyword is always used in FRONT OF the promise.
+2. The RESOLVED value of the promise is stored in the variable.
+3. await is similar to the .then block in Promises.
+4. await is used to HANDLE promises and EXTRACT the value from the promise.
+5. We do NOT need .then() to extract the value when using await.
+
+
+COMPARISON: PROMISES vs ASYNC/AWAIT
+-------------------------------------
+Both handle promises, but they BEHAVE DIFFERENTLY in the Call Stack when there
+is a delay. Let's see.
+
+// WITH PROMISES (setTimeout inside)
+function withPromises() {
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => { resolve("Hello World, after 3 seconds"); }, 3000);
+  });
+  promise.then((data) => { console.log(data); });
+  console.log("Some Synchronous Code");
+}
+withPromises();
+
+OUTPUT: "Some Synchronous Code" -> "Hello World, after 3 seconds" (after 3s)
+REASON: JS does NOT wait for promise. Synchronous code runs first.
+        "Some Synchronous Code" is logged immediately.
+        Promise callback runs after 3 seconds.
+
+
+// WITH ASYNC/AWAIT (same setTimeout inside)
+async function withAsyncAwait() {
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => { resolve("Hello World"); }, 3000);
+  });
+  const data = await promise;
+  console.log(data)
+  console.log("Some Synchronous Code");
+}
+withAsyncAwait();
+
+OUTPUT: (nothing for 3 seconds) -> "Hello World" -> "Some Synchronous Code"
+REASON: This is the KEY DIFFERENCE!
+        The code BELOW the await keyword also waits.
+        But JS is NOT blocked.
+
+
+HOW ASYNC/AWAIT WORKS IN THE CALL STACK
+-----------------------------------------
+This is the most important concept to understand in Async/Await.
+
+1. The code BEFORE the await keyword executes in the call stack NORMALLY.
+2. The moment the AWAIT keyword is encountered, the ENTIRE async function
+   is PUSHED OUT of the call stack.
+3. At this point, if there is any other code to execute, it will run. If
+   nothing else, the call stack will be EMPTY. The main JS execution thread
+   is NEVER BLOCKED.
+4. Once the promise is RESOLVED after the delay, the SAME async function
+   is PUSHED BACK into the call stack and starts to execute WHERE IT LEFT OFF.
+5. So the promise value is stored and the code after await runs.
+
+
+// Extended example to show this clearly
+async function withAsyncAwait() {
+  console.log('Start')   // runs immediately (BEFORE await)
+
+  let promise = new Promise((resolve, reject) => {
+    setTimeout(() => { resolve("Hello World, after 10 seconds"); }, 10000);
+  });
+
+  const data = await promise;    // <-- function LEAVES call stack here
+  console.log(data)              // runs after 10 seconds (when function returns)
+  console.log("Some Synchronous Code, also after 10 seconds");
+}
+withAsyncAwait();
+
+CALL STACK BEHAVIOR:
+Shot 1 (before await): withAsyncAwait is in call stack, 'Start' logged.
+Shot 2 (await hit): withAsyncAwait function LEAVES the call stack.
+Shot 3 (during wait): Call Stack is EMPTY for 10 seconds.
+Shot 4 (after 10s): withAsyncAwait is BACK in call stack.
+Shot 5 (execution continues): 'Hello World' and 'Some Sync Code' are logged.
+
+The main JS execution thread is NEVER blocked. Call stack is never held back.
+The await keyword does NOT make the code wait. It PUSHES the async function
+OUT of the call stack and BRINGS IT BACK once the promise is resolved.
+
+
+ERROR HANDLING IN ASYNC/AWAIT
+-------------------------------
+In Promises we used .catch. In async/await we have three ways:
+
+// WAY 1: .catch on the promise
+async function withAsyncAwait() {
+  let promise = new Promise((resolve, reject) => {
+    reject("Hello World");
+  });
+  await promise.catch((error) => {
+    console.log("Inside Catch Block:", error);
+  });
+}
+withAsyncAwait();
+
+
+// WAY 2: Store and call .catch on function call
+async function withAsyncAwait() {
+  let promise = new Promise((resolve, reject) => {
+    reject("Hello World");
+  });
+  const data = await promise;
+  return data;
+}
+withAsyncAwait().catch((error) => {
+  console.log("Inside Catch Block:", error);
+});
+
+
+// WAY 3 (PREFERRED): try...catch block
+async function withAsyncAwait() {
+  try {
+    let promise = new Promise((resolve, reject) => {
+      reject("Hello World");
+    });
+    await promise;    // rejected promise -> code jumps to catch
+  } catch (error) {
+    console.log("In the Error Block:", error);
+  }
+}
+withAsyncAwait();
+
+The code that is error-prone is written INSIDE the try block. If there is an
+error in the code inside the try block, that error can be CAUGHT in the catch.
+
+
+API IMPLEMENTATION WITH ASYNC/AWAIT
+-------------------------------------
+async function makeApiCall() {
+  try {
+    const fakeApiUrl = "https://jsonplaceholder.typicode.com/todos/1";
+
+    // first promise handling
+    const response = await fetch(fakeApiUrl);
+    console.log("Readable Streamed Data:", response);
+
+    // second promise handling
+    const jsonRes = await response.json();
+    console.log("Actual JSON Response:", jsonRes);
+
+    document.body.innerHTML = JSON.stringify(jsonRes);
+  } catch (error) {
+    document.body.innerHTML = JSON.stringify(error);
+  }
+}
+makeApiCall();
+
+Explanation:
+1. fetch() returns a promise whenever an API call is made to a valid URL.
+2. await handles the first promise and stores the response (Readable Stream).
+3. .json() is called on response to extract JSON data - it also returns a promise.
+4. await handles the second promise and stores the actual JSON data in jsonRes.
+5. Error handling is done using try...catch. Change the URL to invalid and it
+   will throw 404 NOT FOUND error which goes to catch block.
+
+// ERROR HANDLING WITH .CATCH BLOCK (same API call)
+async function makeApiCall() {
+  const fakeApiUrl = "https://jsonplaceholder.typicode.com/todos/1sdsd"; // INVALID
+  const response = await fetch(fakeApiUrl);
+  const jsonRes = await response.json();
+  return jsonRes;
+}
+makeApiCall().catch((err) => {
+  console.log(err);
+});
+
+
+KEY POINTS SUMMARY
+-------------------
+1. An async function ALWAYS returns a promise. If a static value is returned,
+   it is WRAPPED inside a fulfilled promise.
+2. The await keyword MUST always be used with the async keyword.
+3. Whenever JS engine sees an await keyword, the async function's execution
+   context GOES OUT of the call stack. Once the promise is resolved, that same
+   async function is PUSHED BACK to the call stack and runs where it left off.
+4. Error handling can be done with .catch block AND try...catch block.
+5. Never Forget: The await keyword does NOT make the code wait or BLOCK the
+   Global Execution thread. It pushes the async function OUT of the call stack
+   and pushes it BACK once the promise is resolved.
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Making API calls with Angular's HttpClient.toPromise() and async/await.
+- Sequential async operations (get user THEN get their orders).
+- Any async operation you want to write in a synchronous-looking readable style.
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is async/await?
+A1. async/await is a syntactic sugar over Promises. It allows writing async
+    code in a synchronous-looking style. Under the hood, it uses Promises.
+
+Q2. What does an async function ALWAYS return?
+A2. Always a Promise. If static value X is returned, it is wrapped in a
+    fulfilled promise with value X.
+
+Q3. What does await do in the call stack?
+A3. When await is encountered, the entire async function is PUSHED OUT of the
+    call stack. Once the promise resolves, the function is PUSHED BACK and
+    continues from where it left off.
+
+Q4. Does await block the main JS thread?
+A4. NO. It only pushes the async function out of the call stack. Other code
+    still runs. The main JS execution thread is NEVER blocked.
+
+Q5. What is the key difference between Promises and Async/Await when there is
+    a delay inside?
+A5. With Promises: synchronous code BELOW .then() runs BEFORE promise resolves.
+    With Async/Await: code BELOW await ALSO waits. The function leaves the call
+    stack and returns only after the promise resolves.
+
+Q6. How do you handle errors in async/await?
+A6. Using try...catch block (preferred), .catch() on the promise directly, or
+    .catch() on the async function call.
+
+Q7. Can you use await outside an async function?
+A7. No. Using await outside async function throws a SyntaxError.
+
+
+================================================================================
+TOPIC 5: ASYNC/AWAIT - PART 2
+(Interview Problems)
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+We covered the theory in the previous Async/Await story and a couple of
+problems. This topic is just for basic and medium-level coding problems
+related to Promises and Async/Await. You MUST have a thorough understanding
+of theory before solving these problems.
+
+
+GOLDEN RULE:
+If an async function returns a value X, it wraps X in a promise in a
+fulfilled/resolved state and that promise's value is X.
+
+
+PROBLEMS WITH OUTPUTS AND EXPLANATIONS
+----------------------------------------
+
+// PROBLEM 1 - Part A: async with just console.log
+async function myAsync() {
+  console.log(1);
+}
+myAsync();
+
+OUTPUT: 1
+REASON: Simply logs 1. The function returns a promise in fulfilled state
+        with value undefined, but we do not console the function call.
+
+
+// PROBLEM 1 - Part B: async returning a value
+async function myAsync() {
+  return 1;
+}
+console.log(myAsync());
+
+OUTPUT: Promise { 1 }  (fulfilled, value: 1)
+REASON: The very basic concept of async function is: if an async function is
+        returning a value, it would wrap the value in a promise and the promise
+        itself in a resolved state is returned from the async function.
+
+
+// PROBLEM 2: async returning Promise.resolve / new Promise resolve
+async function myAsync() {
+  return Promise.resolve("Hello World");
+}
+console.log(myAsync())
+
+async function myAsync() {
+  return new Promise((resolve) => { resolve("Hello World"); });
+}
+console.log(myAsync());
+
+OUTPUT (both): Promise { <pending> } in logs, but final result is fulfilled.
+REASON: The return of the promise is SYNCHRONOUS, but the resolving of the
+        promise is ASYNCHRONOUS. For a minor split second, the pending promise
+        is returned. But the FINAL result is the resolved promise.
+        Both functions return the same output.
+
+
+// PROBLEM 3: async with await in front of promise
+async function myAsync() {
+  return await Promise.resolve("Hello World");
+}
+console.log(myAsync());
+
+async function myAsync() {
+  const val = await Promise.resolve("Hello World");
+  console.log(val);
+}
+myAsync();
+
+OUTPUT of first: Promise { <pending> } (return is synchronous, await is async)
+OUTPUT of second: Hello World
+REASON:
+- In the first, we return the awaited value. Still shows pending because
+  return itself is synchronous even though await resolves asynchronously.
+- In the second, await resolves the promise and stores the VALUE "Hello World"
+  in val. val is then logged - we get the string, not the promise.
+
+
+// PROBLEM 4: async returning await on a non-promise
+async function myAsync() {
+  return await 1;
+}
+console.log(myAsync());
+
+OUTPUT: Promise { <pending> } (split second), final: Promise { 1 }
+REASON: Same reasoning. Return is synchronous, await makes function wait for
+        a split zero second. Final result is a fulfilled promise with value 1.
+
+
+// PROBLEM 5: Pure Promise inside a function - sync before async
+const callProm = () =>
+  Promise.resolve("resolved promise").then((res) => console.log(res));
+
+function myPromise() {
+  console.log("Before Promise");
+  callProm();
+  console.log("After Promise");
+}
+myPromise();
+
+OUTPUT: Before Promise -> After Promise -> resolved promise
+REASON:
+1. "Before Promise" logged (sync).
+2. callProm() is called. It returns a promise which is ASYNCHRONOUS CODE.
+   The returned promise is registered in the Browser API Environment.
+3. While the promise is in Browser API Env waiting its turn, synchronous code
+   continues. "After Promise" is logged.
+4. Once all synchronous code is done, the promise jumps back to the Call Stack
+   and "resolved promise" is logged. (This is the Event Loop concept.)
+
+
+// PROBLEM 6: await changes the execution order
+async function myAsync() {
+  console.log("Before Await");
+  console.log(await Promise.resolve("Hello World"));
+  console.log("After Await");
+}
+myAsync();
+
+OUTPUT: Before Await -> After Await -> Hello World
+WAIT - Is it Before Await -> Hello World -> After Await? Let me re-check.
+
+Actually OUTPUT: Before Await -> Hello World -> After Await
+REASON:
+1. "Before Await" logged (sync, before await).
+2. await keyword encountered -> myAsync() is pushed OUT of call stack.
+3. Once promise resolves -> "Hello World" is logged.
+4. After that, "After Await" is logged.
+The sync code AFTER await in the SAME function waits too.
+
+
+// PROBLEM 7: await with setTimeout delay
+async function myAsync() {
+  console.log("Before Await");                          // SYNC CODE
+  const promiseValue = await new Promise((resolve, reject) => {
+    setTimeout(resolve, 3000, "Hello World, After 3 seconds");
+  });
+  console.log(promiseValue)                             // after 3 seconds
+  console.log("After Await, After 3 seconds");          // after 3 seconds
+}
+myAsync();
+
+OUTPUT: "Before Await" immediately -> (3 second pause) ->
+        "Hello World, After 3 seconds" -> "After Await, After 3 seconds"
+REASON:
+1. "Before Await" logged right away.
+2. await encountered -> myAsync() is PUSHED OUT of call stack.
+3. setTimeout starts. While function is out, we do NOT have sync code outside.
+   Call stack is EMPTY for 3 seconds.
+4. After 3 seconds, function is BACK in call stack and continues from await.
+   Both remaining consoles log together after 3 seconds.
+
+
+// PROBLEM 8: await with setTimeout + code OUTSIDE async function
+async function myAsync() {
+  console.log("Before Await");
+  const promiseValue = await new Promise((resolve, reject) => {
+    setTimeout(resolve, 3000, "Hello World, After 3 seconds");
+  });
+  console.log(promiseValue)
+  console.log("After Await, After 3 seconds");
+}
+myAsync();
+console.log('Async Function is out')
+
+OUTPUT: "Before Await" -> "Async Function is out" ->
+        (3 second pause) -> "Hello World, After 3 seconds" -> "After Await..."
+REASON:
+1. "Before Await" logged (sync, inside function before await).
+2. await encountered -> async function PUSHED OUT of call stack.
+3. While the async function is out, the console OUTSIDE the function runs.
+   "Async Function is out" is logged.
+4. After 3 seconds, function is BACK and rest of consoles are logged.
+
+
+// PROBLEM 9: Promise function vs Async function - comparison
+const callProm = () => Promise.resolve("Fulfilled");
+
+function funcOne() {
+  callProm().then((val) => console.log(val));
+  console.log("sync code one");
+}
+
+async function funcTwo() {
+  console.log(await callProm());
+  console.log("sync code two");
+}
+
+funcOne();
+funcTwo();
+
+OUTPUT: sync code one -> Fulfilled -> Fulfilled -> sync code two
+REASON:
+1. funcOne() is called. callProm() is called and returns a promise (async).
+   Promise is registered in Browser API Env.
+2. While promise is in Browser API Env, "sync code one" is logged.
+3. After that, the promise from callProm in funcOne is resolved. "Fulfilled" logged.
+4. Now funcTwo() runs, await encountered -> funcTwo() pushed out of stack.
+5. Once promise resolves -> "Fulfilled" and "sync code two" are logged.
+
+
+// PROBLEM 10: Promise vs SYNCHRONOUS funcTwo (no async/await)
+const callProm = () => Promise.resolve("Fulfilled");
+
+function funcOne() {
+  callProm().then((val) => console.log(val));
+  console.log("sync code one");
+}
+
+function funcTwo() {   // funcTwo is now SYNCHRONOUS
+  console.log('Hello');
+  console.log("sync code two");
+}
+
+funcOne();
+funcTwo();
+
+OUTPUT: sync code one -> Hello -> sync code two -> Fulfilled
+REASON:
+1. funcOne runs -> "sync code one" logged, promise is waiting.
+2. While promise is waiting, funcTwo runs (it's synchronous this time).
+3. "Hello" and "sync code two" both logged.
+4. FINALLY, the promise resolves and "Fulfilled" is logged.
+NOTE: funcTwo is synchronous so it executes BEFORE the promise resolves.
+      In Problem 9, funcTwo was async so the promise from funcOne resolved FIRST.
+
+
+// PROBLEM 11: Two sequential awaits with different delays
+const resolvePromiseAfterNSeconds = (value, N) => {
+  return new Promise((res, rej) => {
+    setTimeout(() => { res(value); }, N);
+  });
+};
+
+async function myAsync() {
+  console.log("Beginning the first promise");
+
+  const promiseOne = await resolvePromiseAfterNSeconds("Resolved First Promise", 5000);
+  console.log("After 5 Seconds");
+  console.log(promiseOne);
+
+  const promiseTwo = await resolvePromiseAfterNSeconds("Resolved Second Promise", 10000);
+  console.log("After 10 seconds");
+  console.log(promiseTwo);
+}
+myAsync();
+
+OUTPUT:
+"Beginning the first promise" -- immediately
+(5 second pause)
+"After 5 Seconds" and "Resolved First Promise" -- after 5 seconds
+(5 more second pause -- total 10 seconds from start)
+"After 10 seconds" and "Resolved Second Promise" -- after 10 seconds from first
+
+REASON:
+1. "Beginning the first promise" logged right away.
+2. First await encountered -> myAsync() pushed OUT of call stack. Waits 5 seconds.
+3. After 5 seconds -> myAsync() back in call stack. "After 5 Seconds" and
+   "Resolved First Promise" logged.
+4. Second await encountered -> myAsync() pushed OUT again. Waits 5 more seconds.
+5. After 5 more seconds -> "After 10 seconds" and "Resolved Second Promise" logged.
+
+NOTE: While myAsync was out of the stack, the code DID NOT STOP RUNNING.
+      The call stack is NEVER BLOCKED.
+
+
+// PROBLEM 12: Sequential await + synchronous code OUTSIDE function
+async function myAsync() {
+  console.log("Beginning the first promise");
+  const promiseOne = await resolvePromiseAfterNSeconds("Resolved First Promise", 5000);
+  console.log("After 5 Seconds");
+  console.log(promiseOne);
+}
+myAsync();
+console.log("I am logged while the promise is getting resolved") // OUTSIDE
+
+OUTPUT: "Beginning the first promise" -> "I am logged while the promise..."
+        -> (5 second pause) -> "After 5 Seconds" -> "Resolved First Promise"
+REASON: While myAsync is out of the call stack (waiting 5 seconds), the sync
+        code outside the function runs immediately. Once the function returns
+        to the stack, it finishes execution.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the output?
+    async function fn() { return 1; }
+    console.log(fn());
+A1. Promise { 1 } -- async wraps return value in a fulfilled promise.
+
+Q2. What is the output?
+    async function fn() {
+      console.log("A");
+      await Promise.resolve();
+      console.log("B");
+    }
+    console.log("C");
+    fn();
+    console.log("D");
+A2. C -> A -> D -> B
+    C (sync), A (sync inside fn before await), fn leaves call stack,
+    D (sync outside), promise resolves -> B.
+
+Q3. What is the difference between Problem 5 and Problem 6?
+    (Promise without await vs with await in same function)
+A3. Without await: sync code after callProm() runs BEFORE promise resolves.
+    With await: code after await ALSO waits because function leaves call stack.
+
+Q4. In Problem 9, why does "Fulfilled" log BEFORE "sync code two"?
+A4. Because funcTwo uses await. funcTwo leaves the call stack at await.
+    Meanwhile, funcOne's promise (already registered) resolves and logs "Fulfilled".
+    Then funcTwo comes back and logs "sync code two".
+
+Q5. In Problem 10, why does funcTwo log BEFORE the promise "Fulfilled"?
+A5. Because funcTwo is SYNCHRONOUS (no async/await). It runs completely in the
+    call stack before the promise gets a chance to resolve.
+
+Q6. How do you run two async operations in PARALLEL with async/await?
+A6. Use Promise.all:
+    const [res1, res2] = await Promise.all([asyncCall1(), asyncCall2()]);
+    Both run at the same time and await waits for both to complete.
+
+Q7. What is the difference between sequential and parallel async/await?
+A7. Sequential: await fn1(); await fn2(); -> fn2 waits for fn1 to complete.
+    Parallel:   await Promise.all([fn1(), fn2()]); -> both run together.
+
+

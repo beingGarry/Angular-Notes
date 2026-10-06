@@ -1,0 +1,167 @@
+* Single Page Application
+
+SPA is a web application that loads only a single web document, and then update the body content of that single document via JS-API such as Fetch when diff. content is to be shown.
+
+SPA allows user to use website without loding the whole new pages from the server
+
+- Performance Gains
+- More dynamic experience
+
+* Angular Introduction
+
+Angular is a open source typescript binding framework which binds the HTML and typescript model.
+It is used for making single Page web application as well as mobile application.
+used to create “data binding” → Relation bet’n HTML And variable.
+
+→ When the value of the variable changed, the same will be automatically affected in the HTML element.
+
+→ Developer need not write any code for DOM manipulation
+
+→ Developer can fully concentrate on the application logic instead of writing huge code for DOM manipulation.
+
+→ So we can achieve clean seperation between application logic and DOM manipulation.
+
+features:
+
+typescript based
+faster performance
+Modules : Angular is devided into multiple small part called package.
+
+e.g. : core, common, form, router etc.
+
+Developer can use any of those modules based on the requirement.
+
+Page 3 — Types of compilation in Angular
+
+Types of compilation in angular.
+Angular framework support two types of compilation.
+
+Recommended During development.
+
+- Just in time compilation :
+
+JIT Compiler is a compilation techniq used in in angular that compiles the application templates and components during runtime, right in the client’s browser.
+JIT compilation happens on-the-fly as the application is launched.
+
+Why and when use JIT
+
+use JIT when you are still building and testing your website
+It helps you test faster, fix error easily and experiment with new ideas without waiting.
+Instant feedback, Quick development, Easy Debugging, interactive learning.
+Disadvantage : performance is slower, because everytime when you run the application, the template will be loaded into browser, it take some time to compile.
+Developer need not compile it everytime manualy at cmd. for each modification.
+
+Page 7 — Ahead of Time (AOT) Compilation
+
+Bootstrapping → angular/platform-dynamic browser dynamic package
+
+- Ahead of Time (AOT) compilation.
+AOT is a feature of the angular framework that precompiles angular application before they are loaded into the browser.
+During AOT process, the application template and component are translated into optimized JS code during the development phase.
+It’s like preparing everything in advance so that when people come to the website, it ready to go immediately.
+
+→ Performance is faster, because templates are already compiled.
+
+Disadvantage : The developer need to compile it manually at command prompt for each modification.
+
+This is recommended in production phase only.
+Bootstriping is done by @angular/platform-browser.
+Faster rendering, small bundle size, security,
+AOT compilers can improve performance, security, reliability of your application.
+Page 8 — AOT vs JIT / Compiling vs Transpiling
+
+AOT compilation is a technique used by angular to compile angular template into optimized JS code during build process.
+
+In contrast, JIT compilation, which it is the default compilation mode in angular, compiles template at runtime in the user’s browser.
+
+Compiling → Is the general term for taking source code written in one language and transforming into another.
+Transpiling → Is a specific term for taking source code written in one language and transforming into another language that has similar level of abstraction.
+
+When you compile c#, your method bodies are transformed by compiler into IL. This can not be called transpiling because this two language are very differ level of abstraction.
+
+When you compile ts, it is transformed by the compiler into JS. They are very similar level of abstraction, so you could called this transpiling.
+
+Page 9 — Bootstrapping in Angular
+
+load index.html
+Execute application entry point (main.ts)
+Load and execute Root Module (App.module.ts)
+Execute the Root comp. (App.component.ts)
+Display the template / compo (app.html)
+
+Bootstraping in Angular
+Bootstraping refers to the process of initializing and running an angular application.
+It involves the loading the root module of the application which mostly is app.module.ts and then compiling and launching the component tree.
+
+→ Angular application started
+
+↓
+framework reads main.ts contain Bootstrap code
+
+↓
+It loads the specific module (App module)
+
+↓
+framework processed the Meta data defined in App module
+
+The main file responsible for Bootstrapping in Angular is main.ts or main.js
+
+Angular isn’t limited to only working in the browser which is why we need to tell angular exactly how we want it to bootstrap itself.
+
+In our case we are running in the browser so we use the platformBrowserDynamic function to bootstrap our application.
+
+Page 10 — Sync and Async Task
+
+Sync and Async task.
+When you execute task synchronously, you wait for it to finish before moving on to the next line of code.
+When you execute task asynchronously, the program moves to the next line of code before the task finishes.
+Callback : One way to program asynchronously is to use callback.
+
+We pass function to an asynchronous function which it call it will call when the task is completed.
+
+Synchronous programming :
+
+Synchronous programming, often known as blocking code execution, follows a sequential execution model.
+
+→ operation waits for the previous one to complete, which can be time-consuming.
+
+leading a bad performance and unresponsiveness.
+Asynchronous programming :
+
+It allows many operation to be done at the same time, not waiting for each others result.
+
+Uses callbacks, promises, async/await syntax
+Page 11 — Component / Template / Metadata
+
+Component :
+
+Component is a typescript class that contain application data and application logic within the form of event-handler methods, which respond to the user actions.
+
+It basically consist of html file, css file and ts.file
+Template
+
+Every component has template. The template contain HTML logic i.e design logic. It describe the views.
+
+Selector is used to identify each component uniquely into the component tree.
+Metadata :
+
+The metadata is the additional details about the specific class.
+
+Here component, directives, modules and services are classes. That means all of the component, directives, modules and services contain its own metadata.
+
+Metadata is used to decorate the class so that it configured the expected behaviour of class.
+
+The metadata is represented by decorators.
+
+Page 14 — Modules / Eager Loading
+
+Modules :
+
+Modules are the collection of related component, directives, services, pipes etc.
+
+The module has ngModule decorator with 4 option
+
+The import option is used to import other dependent modules. (BrowserModule is default)
+The declaration option is used to define component and directives in the respective module.
+The Bootstrap option tells angular which component to bootstrap in the application.
+The provider option is used to configure a set of injectable objects that are available in the injector of this module.

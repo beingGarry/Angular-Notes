@@ -1,0 +1,147 @@
+================================================================================
+TOPIC 13: CALLBACKS
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+- In one line, a CALLBACK is a function that is PASSED TO ANOTHER FUNCTION as an argument.
+
+*  In JavaScript, functions are FIRST-CLASS FUNCTIONS - they can be used as values and passed to other functions. 
+The passed callback function is accepted as a parameter and can be invoked inside the receiving function.
+
+- The function that receives the callback is called a HIGHER-ORDER FUNCTION.
+
+
+EXAMPLES (6 ways to pass callbacks)
+-------------------------------------
+
+// Way 1: Pass function name
+function mergeNames(firstName, lastName, displayName) {
+  let fullName = firstName + lastName;
+  return displayName(fullName);
+}
+
+function displayName(name) { console.log(name); }
+mergeNames('bruce', ' wayne', displayName);
+
+// Way 2: Pass function directly
+mergeNames('bruce', ' wayne', function displayName(name) { console.log(name); });
+
+// Way 3: Pass anonymous function
+mergeNames('bruce', ' wayne', function (name) { console.log(name); });
+
+// Way 4: Pass function expression variable
+let printName = function printName(name) { console.log(name); }
+mergeNames('bruce', ' wayne', printName);
+
+// Way 5: Pass arrow function variable
+const printName = (name) => { console.log(name); }
+mergeNames('bruce', ' wayne', printName);
+
+// Way 6: Pass anonymous arrow function
+mergeNames('bruce', ' wayne', (name) => { console.log(name); });
+
+All above ways are CORRECT.
+
+
+CALLBACKS IN EVENT LISTENER
+-----------------------------
+document.addEventListener('click', () => { console.log('clicked'); });
+// Callback executes ONLY when user clicks document.
+
+
+CALLBACKS IN SETTIMEOUT
+------------------------
+setTimeout(() => { console.log('After 2 seconds'); }, 2000);
+// Callback executes after the specified delay.
+
+
+SYNCHRONOUS vs ASYNCHRONOUS CALLBACKS
+---------------------------------------
+1. SYNCHRONOUS CALLBACKS: Execute immediately (without any delay) when the
+   higher-order function is called.
+   Examples: map, filter, reduce
+
+   let arr = [1, 2, 3];
+   let mappedArr = arr.map((x) => x);
+   console.log(mappedArr); // [1, 2, 3]
+   The callback in map executes alongside map, no blocking.
+
+2. ASYNCHRONOUS CALLBACKS: Execute after a specified delay or after some user
+   event occurs.
+   Examples: setTimeout, setInterval, event listeners
+
+   setTimeout(() => { console.log('After 2 seconds'); }, 2000);
+   document.addEventListener('click', () => { console.log('clicked'); });
+   The callback executes only after 2 seconds or when user clicks.
+
+
+CALLBACK HELL (Pyramid of Doom)
+---------------------------------
+- If we have tasks where each step must execute after the previous one, we can use nested setTimeouts. But with many steps, this becomes problematic.
+
+// 3 steps - still manageable:
+setTimeout(() => {
+  console.log('First Step Completed.');
+  setTimeout(() => {
+    console.log('Second Step Completed.');
+    setTimeout(() => {
+      console.log('Third Step Completed.');
+    }, 2000);
+  }, 2000);
+}, 2000);
+
+// With many steps - CALLBACK HELL:
+setTimeout(() => {
+  console.log('first callback');
+  setTimeout(() => {
+    console.log('second callback');
+    setTimeout(() => {
+      console.log('third callback');
+      setTimeout(() => {
+        console.log('fourth callback');
+        // ... and so on horizontally!
+      }, 2000);
+    }, 2000);
+  }, 2000);
+}, 2000);
+
+PROBLEMS WITH CALLBACK HELL:
+- Hard to manage and understand
+- Non-scalable
+- Code grows HORIZONTALLY instead of VERTICALLY (pyramid/doom shape)
+- Difficult to handle errors
+
+SOLUTION: Promises or async/await (covered in next topics).
+
+
+REAL-TIME EXAMPLES
+-------------------
+- Array methods (map, filter, reduce) use synchronous callbacks.
+- Click handlers and event listeners use async callbacks.
+- setTimeout/setInterval use async callbacks.
+- API calls used to rely on callbacks (now typically use Promises).
+- Node.js file I/O callbacks.
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is a callback function?
+A1. A callback is a function passed to another function as an argument.
+    It's called/invoked inside the outer function after some time or condition.
+
+Q2. What is the difference between synchronous and asynchronous callbacks?
+A2. Synchronous: executes immediately alongside the higher-order function (e.g., map).
+    Asynchronous: executes after a delay or user event (e.g., setTimeout, addEventListener).
+
+Q3. What is callback hell?
+A3. A situation where multiple callbacks are nested inside each other, creating deeply nested, hard-to-read code that grows horizontally (pyramid of doom).
+
+Q4. What is callback hell also known as?
+A4. Pyramid of Doom.
+
+Q5. How do you fix callback hell?
+A5. Use Promises or async/await instead of nested callbacks.
+
+Q6. What is a first-class function in JavaScript?
+A6. A first-class function means functions can be used as values - they can be passed to other functions as arguments, returned from functions, or assigned to variables.
+

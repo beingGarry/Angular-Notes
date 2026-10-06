@@ -1,0 +1,42 @@
+What is Eager and lazy loading :
+
+Eager loading :
+
+The eager loading technique is the default module-loading strategy in angular.
+
+Eager loading feature modules are loaded before the program begin. This is primarily utilized for small-scale application.
+
+All modules are loaded when the application starts regardless whether they are needed or not.
+
+Page 15 — Lazy Loading
+
+Lazy loading :
+
+Loads the feature modules dynamically as needed. This speed up the application.
+
+It is utilized for larger project where all the modules are not required at start.
+
+→ Lazy loading is a technique where modules are loaded on demand, as and when they are needed.
+
+It can reduce bundle size, and improve application loading speed specially for large application.
+
+e.g
+
+const routes = [
+ {
+  path : 'dashboard',
+  component : DashboardModule
+ },
+ {
+  path : 'admin',
+  loadChildren : () => import('./admin/admin.module')
+  .then(m => m.AdminModule)
+ }
+]
+
+In this case adminModule is only loaded when user navigate to the '/admin' route.
+
+Lazy loading is accomplished by loadChildren property in the route configuration.
+
+The import statement inside loadChildren tells angular to load the module on-demand when the associated route is accessed.
+

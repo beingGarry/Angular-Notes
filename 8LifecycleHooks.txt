@@ -1,0 +1,44 @@
+Lifecycle Hooks
+
+Lifecycle Hooks
+
+Angular application goes through an entire process & has a lifecycle right from its initialization to the end of application.
+
+Hooks are some method added in application to get control of application.
+
+Constructor
+
+A) what it does : Set up the component
+B) when it run : when the component is created.
+
+ngOnChanges
+
+A) Responds to change in ip input properties
+B) Every time an input property change.
+
+ngOnInit()
+Initializes the component
+Once after the component is created and input properties are set.
+ngDoCheck
+Check for changes that angular might not detect.
+Frequently, during every change detection run
+ngDoCheck and ngOnChanges should not be implemented together at the same time.
+Page 29 — More Lifecycle Hooks
+
+These below hooks are only called for components not for directives.
+
+ngAfterContentInit()
+Respond after content (ng-content) is projected into the component
+Once, after projecting component into the component.
+ngAfterContentChecked()
+Respond after content projection is changed.
+Every time content projection is checked.
+ngAfterViewInit();
+Respond after the components view and its child views are initialized.
+Once after the component view is initialized.
+ngAfterViewChecked()
+Respond after the components view and its child views are checked.
+Every time the view is checked.
+ngOnDestroy
+cleans up before the component is destroyd
+Just before the component is destroyed.

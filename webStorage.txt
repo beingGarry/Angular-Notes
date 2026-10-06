@@ -1,0 +1,99 @@
+- Web Storage is a feature of HTML5 that allows web applications to store data in a user's browser. It provides a way to store data locally, enabling persistent data storage between sessions without the need for cookies. There are two main types of Web Storage: localStorage and sessionStorage.
+
+1. localStorage
+
+Definition: localStorage is used to store data with no expiration time. 
+
+The data remains even after the browser is closed and reopened.
+
+- Capacity: Typically around 5-10 MB (depending on the browser).
+
+- Use Case: Suitable for storing user preferences, themes, or any data that should persist across sessions.
+
+Example:
+
+javascript
+Copy code
+// Store data
+localStorage.setItem('username', 'JohnDoe');
+
+// Retrieve data
+const username = localStorage.getItem('username');
+console.log(username); // Output: JohnDoe
+
+// Remove data
+localStorage.removeItem('username');
+
+// Clear all data
+localStorage.clear();
+
+2. sessionStorage
+
+Definition: sessionStorage is used to store data for the duration of the page session. 
+
+The data is cleared when the page session ends (e.g., when the tab or browser is closed).
+
+Suitable for scenarios where you want to keep the user logged in only during the current session.
+
+- Capacity: Similar to localStorage, usually around 5-10 MB.
+- Use Case: Ideal for storing data that is specific to a single session, such as form data or user state during a session.
+Example:
+
+javascript
+Copy code
+// Store data
+sessionStorage.setItem('sessionId', 'abc123');
+
+// Retrieve data
+const sessionId = sessionStorage.getItem('sessionId');
+console.log(sessionId); // Output: abc123
+
+// Remove data
+sessionStorage.removeItem('sessionId');
+
+// Clear all data
+sessionStorage.clear();
+
+* Key Differences Between localStorage and sessionStorage
+
+- localStorage	
+Data persists across sessions	
+Available across tabs/windows	
+Usually 5-10 MB	
+Accessing Web Storage
+
+- sessionStorage
+Data is cleared when the session ends
+Available only within the same tab
+Usually 5-10 MB
+
+* Both localStorage and sessionStorage are accessed through the window object in the browser:
+
+javascript
+Copy code
+console.log(window.localStorage);
+console.log(window.sessionStorage);
+Data Types
+
+- Both localStorage and sessionStorage only store string data. To store objects, you need to serialize them using JSON.stringify() and deserialize with JSON.parse().
+
+Example:
+
+javascript
+Copy code
+// Storing an object
+const user = { name: 'John', age: 30 };
+localStorage.setItem('user', JSON.stringify(user));
+
+// Retrieving an object
+const storedUser = JSON.parse(localStorage.getItem('user'));
+console.log(storedUser.name); // Output: John
+
+* Conclusion
+Web Storage provides a simple way to store data on the client side, making it easier to manage state and user preferences without relying on server-side storage. It’s widely supported in modern browsers, making it a reliable choice for web applications.
+
+
+
+
+
+

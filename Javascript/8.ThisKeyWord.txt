@@ -1,0 +1,156 @@
+================================================================================
+TOPIC 8: THIS KEYWORD
+================================================================================
+
+DEFINITION & EXPLANATION
+--------------------------
+The THIS is an object whose REFERENCE CHANGES based on where it is being accessed.
+THIS is NOT a variable - its value cannot be changed (except with call/apply/bind).
+
+THIS in different situations:
+1. THIS alone -> refers to window global object
+2. THIS inside a function -> refers to window global object
+3. THIS inside an arrow function -> refers to window object
+4. THIS inside the method of an object -> refers to the object itself
+5. THIS inside the arrow function of an object -> refers to window object
+6. THIS inside strict mode -> undefined (inside a function)
+7. THIS inside constructor -> refers to the constructed object
+8. THIS in event -> refers to the triggering HTML element
+9. THIS in Call, Apply, Bind -> can refer to any object you pass
+
+
+EXAMPLES
+---------
+
+// 1. Alone THIS
+console.log(this); // window object
+
+// 2. Inside Function (all types)
+function z() { console.log(this); } z(); // window object
+let y = function () { console.log(this); }; y(); // window object
+let x = function a() { console.log(this); }; x(); // window object
+
+// 3. Inside Arrow Function
+const z = () => { console.log(this) }
+z(); // window object
+
+// 4. Inside method of an object
+let info = {
+  age: 20,
+  getAge: function () { return this.age; },
+};
+console.log(info.getAge()); // 20 -- THIS = info object
+
+// 5. Inside Arrow Function of an object
+let info = {
+  age: 20,
+  getAge: () => { return this; },
+};
+console.log(info.getAge()); // window object -- THIS is NOT info!
+
+// 6. THIS in Strict Mode
+'use strict'
+function z() { console.log(this) }
+z(); // undefined
+
+// 7. THIS in Event
+// <button onclick="this.style.backgroundColor='red'">Click</button>
+// THIS refers to the button element
+
+// 8. THIS inside constructor
+function Person(fName, lName) {
+  this.firstName = fName;
+  this.lastName = lName;
+  this.getFullName = function () {
+    return this.firstName + " " + this.lastName;
+  };
+}
+let person = new Person("Bruce", "Wayne");
+console.log(person.getFullName()); // Bruce Wayne
+
+
+INTERVIEW PROBLEMS
+-------------------
+
+// Problem 1a: THIS inside regular method vs arrow method
+const batman = {
+  firstName: "Bruce", lastName: "Wayne",
+  getFullName: function () { return this.firstName + " " + this.lastName; },
+};
+console.log(batman.getFullName()); // Bruce Wayne (THIS = batman object)
+
+const batman2 = {
+  firstName: "Bruce", lastName: "Wayne",
+  getFullName: () => { return this.firstName + " " + this.lastName; },
+};
+console.log(batman2.getFullName()); // undefined undefined (THIS = window)
+
+// If var firstName = 'Peter' and var lastName = 'Parker' declared globally:
+var firstName = 'Peter'; var lastName = 'Parker';
+const batman3 = {
+  firstName: "Bruce", lastName: "Wayne",
+  getFullName: () => { return this.firstName + " " + this.lastName; },
+};
+console.log(batman3.getFullName()); // Peter Parker (THIS = window, window.firstName = Peter)
+
+
+// Problem 2: THIS changes based on which object method is called on
+const dayTime = { name: "Bruce Wayne", getRealName: function () { console.log(this.name); } };
+const nightTime = { name: "Batman", getRealName: function () { console.log(this.name); } };
+dayTime.getRealName();  // Bruce Wayne
+nightTime.getRealName(); // Batman
+
+
+// Problem 3: setTimeout loses THIS context
+const person = {
+  name: "Bruce Wayne",
+  getName: function() { console.log(this.name); }
+};
+person.getName();  // Bruce Wayne (THIS = person)
+setTimeout(person.getName, 2000) // undefined (THIS = window, context LOST!)
+
+// FIX using bind:
+setTimeout(person.getName.bind(person), 2000) // Bruce Wayne after 2 seconds
+
+
+// Problem 4: Tricky - callback inside method
+var name = 'Peter'; // var gets attached to window
+function printName() { console.log('Outside Object', this.name) }
+const details = {
+  name: 'Bruce',
+  getName: function (cb) {
+    console.log('Inside Object', this.name);
+    cb();
+  }
+}
+details.getName(printName);
+// Inside Object Bruce  (THIS inside getName = details object)
+// Outside Object Peter (THIS inside printName = window, window.name = Peter)
+
+NOTE: If name was declared with let/const instead of var, it would be
+'undefined' because let/const variables don't get attached to window object.
+
+
+POSSIBLE INTERVIEW Q&A
+-----------------------
+Q1. What is the THIS keyword?
+A1. THIS is an object whose reference changes based on where it is accessed.
+    Alone or in regular function = window. Inside object method = the object.
+    Inside arrow function = window (regardless of where). In strict mode
+    inside a function = undefined.
+
+Q2. What is the difference between THIS in a regular method and arrow methodinside an object?
+A2. Regular method: THIS = the object itself.
+    Arrow method: THIS = window object (arrows don't have their own THIS).
+
+Q3. What is the output?
+    const obj = { name: "test", get: () => { return this.name } };
+    console.log(obj.get());
+A3. undefined (THIS in arrow function = window, no 'name' property on window)
+
+Q4. How do you fix the THIS context loss in setTimeout?
+A4. Use bind: setTimeout(person.getName.bind(person), 2000)
+
+Q5. What is THIS in strict mode inside a function?
+A5. undefined.
+
