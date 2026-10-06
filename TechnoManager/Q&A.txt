@@ -57,3 +57,20 @@ If the interviewer wants a quick answer:
 "We had a production issue with document upload. The upload was working locally but larger files were failing after deployment because we were sending the file data in a large JSON payload. I checked the Network tab and compared the requests between environments. We changed the implementation to use FormData and multipart/form-data, sending the file separately along with the required fields. We also verified the backend and environment file-size configuration. After testing different file sizes, the upload worked correctly. The key learning was to consider environment-level request and upload limits, not just local functionality."
 
 This is a very good story for Q2: "Tell me about a production issue you handled" because it naturally demonstrates problem → investigation → root cause → solution → validation → learning.
+
+
+==================================================================
+* Conflicts with team
+Conflicts can happen in any team, especially when people have different technical approaches or priorities. I try to handle them professionally and focus on the problem rather than the person.
+First, I listen to the other person's point of view and understand why they are suggesting that approach. Then I explain my own perspective with technical reasons, such as maintainability, performance, scalability or project requirements.
+For example, if another developer and I have different approaches for implementing an Angular onboarding workflow, instead of arguing about whose approach is better, I would compare both approaches based on the actual requirement and trade-offs.
+If we still cannot reach an agreement, I would involve a senior developer, architect or manager and let the team make the final decision.
+Once the decision is made, I support it professionally, even if it wasn't my preferred approach. The important thing is that the team delivers the best solution for the project."
+
+If they ask: "What if the other developer is not listening?"
+"I would avoid continuing the argument in front of the team. I would have a one-to-one discussion and try to understand the concern. If the disagreement is still affecting the work, I would involve the appropriate senior person with facts and technical context rather than making it personal."
+
+Short version to remember
+Listen → Understand → Explain → Compare trade-offs → Decide → Move forward
+One strong line to remember:
+"I don't try to win a technical argument; I try to find the best solution for the project."
